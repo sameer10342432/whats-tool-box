@@ -80,13 +80,16 @@ export default function AiCaptionScreen() {
         credentials: "include",
       });
 
-      if (!res.ok) throw new Error("Failed to generate captions");
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.error || "Failed to generate captions");
+      }
 
       const data = await res.json();
       setCaptions(data.captions || []);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    } catch (e) {
-      Alert.alert("Error", "Failed to generate captions. Please try again.");
+    } catch (e: any) {
+      Alert.alert("Error", e.message || "Failed to generate captions. Please try again.");
     } finally {
       setLoading(false);
     }

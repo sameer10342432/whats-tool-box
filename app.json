@@ -37,6 +37,15 @@
     },
     "plugins": [
       [
+        "expo-build-properties",
+        {
+          "android": {
+            "requestLegacyExternalStorage": true,
+            "usesCleartextTraffic": true
+          }
+        }
+      ],
+      [
         "expo-router",
         {
           "origin": "https://replit.com/"

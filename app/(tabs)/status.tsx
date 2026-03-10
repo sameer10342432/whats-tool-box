@@ -29,6 +29,13 @@ const WHATSAPP_PATHS = [
   "file:///storage/emulated/0/Android/media/com.whatsapp/WhatsApp/Media/.Statuses/",
   "file:///storage/emulated/0/WhatsApp/Media/.Statuses/",
   "file:///storage/emulated/0/Android/media/com.whatsapp.w4b/WhatsApp Business/Media/.Statuses/",
+  "file:///storage/emulated/0/WhatsApp Business/Media/.Statuses/",
+  "file:///storage/emulated/0/Android/media/com.gbwhatsapp/WhatsApp/Media/.Statuses/",
+  "file:///storage/emulated/0/GBWhatsApp/Media/.Statuses/",
+  "file:///storage/emulated/0/Android/media/com.fmwhatsapp/WhatsApp/Media/.Statuses/",
+  "file:///storage/emulated/0/FMWhatsApp/Media/.Statuses/",
+  "file:///storage/emulated/0/Android/media/com.yowhatsapp/WhatsApp/Media/.Statuses/",
+  "file:///storage/emulated/0/YoWhatsApp/Media/.Statuses/",
 ];
 
 const IMAGE_EXTS = [".jpg", ".jpeg", ".png", ".webp"];
@@ -63,9 +70,25 @@ export default function StatusScreen() {
 
   useEffect(() => {
     if (Platform.OS === "android") {
-      scanStatuses();
+      requestPermissionAndScan();
     }
   }, []);
+
+  async function requestPermissionAndScan() {
+    try {
+      const { status } = await MediaLibrary.getPermissionsAsync();
+      if (status !== "granted") {
+        const { status: newStatus } = await MediaLibrary.requestPermissionsAsync();
+        if (newStatus !== "granted") {
+          setError("permission");
+          return;
+        }
+      }
+      scanStatuses();
+    } catch (e) {
+      setError("permission");
+    }
+  }
 
   async function scanStatuses(isRefresh = false) {
     if (Platform.OS !== "android") return;
@@ -83,16 +106,37 @@ export default function StatusScreen() {
 
       for (const path of WHATSAPP_PATHS) {
         try {
+          // Check if path exists
           const info = await FileSystem.getInfoAsync(path);
           if (info.exists) {
             const files = await FileSystem.readDirectoryAsync(path);
-            if (files.length > 0) {
+            if (files && files.length > 0) {
               foundPath = path;
               allFiles = files;
               break;
             }
           }
-        } catch {}
+        } catch (err) {
+          // Silent fail for individual path checks
+        }
+      }
+
+      if (!foundPath) {
+        // Try fallback check without trailing slash just in case
+        for (const path of WHATSAPP_PATHS) {
+          const base = path.endsWith("/") ? path.slice(0, -1) : path;
+          try {
+            const info = await FileSystem.getInfoAsync(base);
+            if (info.exists) {
+              const files = await FileSystem.readDirectoryAsync(base);
+              if (files && files.length > 0) {
+                foundPath = base.endsWith("/") ? base : base + "/";
+                allFiles = files;
+                break;
+              }
+            }
+          } catch {}
+        }
       }
 
       if (!foundPath) {
@@ -116,8 +160,9 @@ export default function StatusScreen() {
         }
       }
 
-      setImages(imgs);
-      setVideos(vids);
+      // Sort by newest if possible (though we don't have mtime here easily without more info calls)
+      setImages(imgs.reverse());
+      setVideos(vids.reverse());
     } catch (e: any) {
       const msg = e?.message || "";
       if (msg.includes("permission") || msg.includes("Permission")) {

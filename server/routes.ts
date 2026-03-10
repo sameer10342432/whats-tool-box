@@ -10,6 +10,10 @@ const openai = new OpenAI({
 export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/generate-caption", async (req, res) => {
     try {
+      if (!process.env.AI_INTEGRATIONS_OPENAI_API_KEY) {
+        return res.status(500).json({ error: "OpenAI API key is missing on the server" });
+      }
+
       const { topic, styles } = req.body as {
         topic: string;
         styles: string[];
@@ -71,6 +75,10 @@ Return a JSON object with this exact structure:
 
   app.post("/api/generate-sticker", async (req, res) => {
     try {
+      if (!process.env.AI_INTEGRATIONS_OPENAI_API_KEY) {
+        return res.status(500).json({ error: "OpenAI API key is missing on the server" });
+      }
+
       const { prompt } = req.body as { prompt: string };
 
       if (!prompt) {

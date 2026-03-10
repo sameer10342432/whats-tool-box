@@ -60,11 +60,14 @@ export default function AiStickerScreen() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ prompt }),
       });
-      if (!res.ok) throw new Error("Server error");
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.error || "Server error");
+      }
       const data = await res.json();
       setResult(data);
-    } catch {
-      Alert.alert("Error", "Failed to generate sticker. Please try again.");
+    } catch (e: any) {
+      Alert.alert("Error", e.message || "Failed to generate sticker. Please try again.");
     } finally {
       setLoading(false);
     }
