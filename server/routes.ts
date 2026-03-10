@@ -3,8 +3,7 @@ import { createServer, type Server } from "node:http";
 import OpenAI from "openai";
 
 const openai = new OpenAI({
-  apiKey: process.env.AI_INTEGRATIONS_OPENAI_API_KEY,
-  baseURL: process.env.AI_INTEGRATIONS_OPENAI_BASE_URL,
+  apiKey: process.env.OPENAI_API_KEY,
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -20,42 +19,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const styleDescriptions: Record<string, string> = {
-        funny: "humorous, witty, with a lighthearted joke or pun",
-        motivational: "inspiring, uplifting, empowering, energetic",
-        romantic: "sweet, loving, poetic, emotional",
-        business: "professional, formal, value-oriented",
-        aesthetic: "beautiful, poetic, minimalist, dreamy",
-        sarcastic: "ironic, dry humor, tongue-in-cheek",
+        funny: "humorous and witty, with a lighthearted joke or pun",
+        motivational: "inspiring, uplifting, empowering and energetic",
+        romantic: "sweet, loving, poetic and emotional",
+        business: "professional, formal and value-oriented",
+        aesthetic: "beautiful, poetic, minimalist and dreamy",
+        sarcastic: "ironic with dry humor and tongue-in-cheek wit",
       };
 
-      const stylePrompts = styles
-        .map((s) => `- ${s}: ${styleDescriptions[s] || "creative"}`)
+      const styleList = styles
+        .map((s) => `- ${s}: ${styleDescriptions[s] || "creative and engaging"}`)
         .join("\n");
 
-      const prompt = `Generate ${styles.length} unique WhatsApp status captions for: "${topic}"
+      const prompt = `Generate ${styles.length} WhatsApp status caption(s) about: "${topic}"
 
-Generate one caption for each of these styles:
-${stylePrompts}
+Create one caption per style listed below:
+${styleList}
 
 Rules:
-- Each caption should be 1-3 sentences
-- Include relevant emojis
-- Make them sound natural and authentic
-- WhatsApp-friendly tone
+- Each caption is 1-3 sentences maximum
+- Include 1-3 relevant emojis naturally
+- Sound authentic and casual, not generic
+- Suitable for WhatsApp status
 
-Return ONLY a JSON object like this:
+Return a JSON object with this exact structure:
 {
   "captions": [
-    {"style": "funny", "text": "..."},
-    {"style": "motivational", "text": "..."}
+    {"style": "funny", "text": "Your funny caption here 😂"},
+    {"style": "motivational", "text": "Your motivational caption here 💪"}
   ]
 }`;
 
       const response = await openai.chat.completions.create({
-        model: "gpt-5-nano",
+        model: "gpt-4o-mini",
         messages: [{ role: "user", content: prompt }],
         response_format: { type: "json_object" },
-        max_completion_tokens: 1000,
+        max_tokens: 1000,
+        temperature: 0.9,
       });
 
       const content = response.choices[0]?.message?.content || "{}";
