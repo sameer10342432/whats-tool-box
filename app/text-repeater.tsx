@@ -11,8 +11,8 @@ import {
   Linking,
   KeyboardAvoidingView,
   Platform,
-  Clipboard,
 } from "react-native";
+import * as Clipboard from "expo-clipboard";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import Colors from "@/constants/colors";
@@ -43,11 +43,7 @@ export default function TextRepeaterScreen() {
     const result = getRepeated();
     if (!result) return;
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    if (Platform.OS === "web") {
-      await navigator.clipboard.writeText(result);
-    } else {
-      Clipboard.setString(result);
-    }
+    await Clipboard.setStringAsync(result);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   }

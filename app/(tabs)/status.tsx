@@ -93,8 +93,6 @@ export default function StatusScreen() {
         mediaTypes: ["images", "videos"],
         allowsMultipleSelection: true,
         quality: 1,
-        selectionLimit: 100,
-        orderedSelection: false,
       });
 
       if (!result.canceled && result.assets.length > 0) {

@@ -7,11 +7,10 @@ import {
   TouchableOpacity,
   ScrollView,
   useColorScheme,
-  Platform,
-  Clipboard,
   Linking,
   Alert,
 } from "react-native";
+import * as Clipboard from "expo-clipboard";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import Colors from "@/constants/colors";
@@ -176,11 +175,7 @@ export default function FancyTextScreen() {
 
   async function copyStyle(id: string, text: string) {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    if (Platform.OS === "web") {
-      await navigator.clipboard.writeText(text);
-    } else {
-      Clipboard.setString(text);
-    }
+    await Clipboard.setStringAsync(text);
     setCopiedId(id);
     setTimeout(() => setCopiedId(null), 2000);
   }

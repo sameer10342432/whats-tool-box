@@ -9,10 +9,9 @@ import {
   useColorScheme,
   ActivityIndicator,
   Alert,
-  Platform,
-  Clipboard,
   Linking,
 } from "react-native";
+import * as Clipboard from "expo-clipboard";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { LinearGradient } from "expo-linear-gradient";
@@ -95,11 +94,7 @@ export default function AiCaptionScreen() {
 
   async function copyCaption(text: string, idx: number) {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    if (Platform.OS === "web") {
-      await navigator.clipboard.writeText(text);
-    } else {
-      Clipboard.setString(text);
-    }
+    await Clipboard.setStringAsync(text);
     setCopiedIdx(idx);
     setTimeout(() => setCopiedIdx(null), 2000);
   }
