@@ -1,4 +1,3 @@
-// template
 import {
   Inter_400Regular,
   Inter_500Medium,
@@ -14,14 +13,54 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { queryClient } from "@/lib/query-client";
+import { useColorScheme } from "react-native";
+import Colors from "@/constants/colors";
 
-// Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
 function RootLayoutNav() {
+  const colorScheme = useColorScheme();
+  const isDark = colorScheme === "dark";
+  const theme = isDark ? Colors.dark : Colors.light;
+
   return (
-    <Stack screenOptions={{ headerBackTitle: "Back" }}>
+    <Stack
+      screenOptions={{
+        headerBackTitle: "Back",
+        headerStyle: { backgroundColor: theme.card },
+        headerTintColor: Colors.primary,
+        headerTitleStyle: { color: theme.text, fontFamily: "Inter_600SemiBold" },
+      }}
+    >
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      <Stack.Screen
+        name="direct-chat"
+        options={{ title: "Direct Chat", headerShown: true }}
+      />
+      <Stack.Screen
+        name="text-repeater"
+        options={{ title: "Text Repeater", headerShown: true }}
+      />
+      <Stack.Screen
+        name="bulk-message"
+        options={{ title: "Bulk Message", headerShown: true }}
+      />
+      <Stack.Screen
+        name="fancy-text"
+        options={{ title: "Fancy Text", headerShown: true }}
+      />
+      <Stack.Screen
+        name="ai-caption"
+        options={{ title: "AI Caption", headerShown: true }}
+      />
+      <Stack.Screen
+        name="status-scheduler"
+        options={{ title: "Status Scheduler", headerShown: true }}
+      />
+      <Stack.Screen
+        name="saved-status"
+        options={{ title: "Saved Status", headerShown: true }}
+      />
     </Stack>
   );
 }
@@ -45,7 +84,7 @@ export default function RootLayout() {
   return (
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
-        <GestureHandlerRootView>
+        <GestureHandlerRootView style={{ flex: 1 }}>
           <KeyboardProvider>
             <RootLayoutNav />
           </KeyboardProvider>

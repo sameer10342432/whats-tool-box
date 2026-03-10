@@ -1,21 +1,34 @@
-// template
 import { isLiquidGlassAvailable } from "expo-glass-effect";
 import { Tabs } from "expo-router";
 import { NativeTabs, Icon, Label } from "expo-router/unstable-native-tabs";
 import { BlurView } from "expo-blur";
-import { SymbolView } from "expo-symbols";
-import { Platform, StyleSheet, useColorScheme } from "react-native";
+import { Platform, StyleSheet, useColorScheme, View } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import React from "react";
-
 import Colors from "@/constants/colors";
 
-//IMPORTANT: iOS 26 Exists, feel free to use NativeTabs for native tabs with liquid glass support.
 function NativeTabLayout() {
   return (
     <NativeTabs>
       <NativeTabs.Trigger name="index">
         <Icon sf={{ default: "house", selected: "house.fill" }} />
         <Label>Home</Label>
+      </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="status">
+        <Icon sf={{ default: "photo.on.rectangle", selected: "photo.on.rectangle.angled" }} />
+        <Label>Status</Label>
+      </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="tools">
+        <Icon sf={{ default: "wrench", selected: "wrench.fill" }} />
+        <Label>Tools</Label>
+      </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="creative">
+        <Icon sf={{ default: "sparkles", selected: "sparkles" }} />
+        <Label>Creative</Label>
+      </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="settings">
+        <Icon sf={{ default: "gearshape", selected: "gearshape.fill" }} />
+        <Label>Settings</Label>
       </NativeTabs.Trigger>
     </NativeTabs>
   );
@@ -24,29 +37,33 @@ function NativeTabLayout() {
 function ClassicTabLayout() {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
+  const isIOS = Platform.OS === "ios";
+  const isWeb = Platform.OS === "web";
+  const theme = isDark ? Colors.dark : Colors.light;
 
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors.light.tint,
-        tabBarInactiveTintColor: Colors.light.tabIconDefault,
-        headerShown: true,
+        headerShown: false,
+        tabBarActiveTintColor: Colors.primary,
+        tabBarInactiveTintColor: theme.tabIconDefault,
         tabBarStyle: {
           position: "absolute",
-          backgroundColor: Platform.select({
-            ios: "transparent",
-            android: isDark ? "#000" : "#fff",
-          }),
-          borderTopWidth: 0,
+          backgroundColor: isIOS ? "transparent" : theme.card,
+          borderTopWidth: isWeb ? 1 : 0,
+          borderTopColor: theme.border,
           elevation: 0,
+          ...(isWeb ? { height: 84 } : {}),
         },
         tabBarBackground: () =>
-          Platform.OS === "ios" ? (
+          isIOS ? (
             <BlurView
               intensity={100}
               tint={isDark ? "dark" : "light"}
               style={StyleSheet.absoluteFill}
             />
+          ) : isWeb ? (
+            <View style={[StyleSheet.absoluteFill, { backgroundColor: theme.card }]} />
           ) : null,
       }}
     >
@@ -54,8 +71,44 @@ function ClassicTabLayout() {
         name="index"
         options={{
           title: "Home",
-          tabBarIcon: ({ color }) => (
-            <SymbolView name="house" tintColor={color} size={24} />
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="home" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="status"
+        options={{
+          title: "Status",
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="images" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="tools"
+        options={{
+          title: "Tools",
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="construct" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="creative"
+        options={{
+          title: "Creative",
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="sparkles" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="settings"
+        options={{
+          title: "Settings",
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="settings" size={size} color={color} />
           ),
         }}
       />
