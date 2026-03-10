@@ -71,7 +71,7 @@ export default function StatusScreen() {
 
   async function checkPermission() {
     if (Platform.OS === "web") return;
-    const { status } = await MediaLibrary.getPermissionsAsync();
+    const { status } = await MediaLibrary.getPermissionsAsync(false);
     setPermissionStatus(status as any);
     if (status === "granted") {
       loadMedia(true);
@@ -79,7 +79,7 @@ export default function StatusScreen() {
   }
 
   async function requestPermission() {
-    const { status } = await MediaLibrary.requestPermissionsAsync();
+    const { status } = await MediaLibrary.requestPermissionsAsync(false);
     setPermissionStatus(status as any);
     if (status === "granted") {
       loadMedia(true);
