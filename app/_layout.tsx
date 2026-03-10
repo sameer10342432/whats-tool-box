@@ -61,6 +61,26 @@ function RootLayoutNav() {
         name="saved-status"
         options={{ title: "Saved Status", headerShown: true }}
       />
+      <Stack.Screen
+        name="chat-backup"
+        options={{ title: "Chat Backup Viewer", headerShown: true }}
+      />
+      <Stack.Screen
+        name="status-analytics"
+        options={{ title: "Status Analytics", headerShown: true }}
+      />
+      <Stack.Screen
+        name="ai-sticker"
+        options={{ title: "AI Sticker Generator", headerShown: true }}
+      />
+      <Stack.Screen
+        name="chat-organizer"
+        options={{ title: "Chat Organizer", headerShown: true }}
+      />
+      <Stack.Screen
+        name="media-cleaner"
+        options={{ title: "Media Cleaner", headerShown: true }}
+      />
     </Stack>
   );
 }

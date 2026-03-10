@@ -69,6 +69,47 @@ Return a JSON object with this exact structure:
     }
   });
 
+  app.post("/api/generate-sticker", async (req, res) => {
+    try {
+      const { prompt } = req.body as { prompt: string };
+
+      if (!prompt) {
+        return res.status(400).json({ error: "prompt is required" });
+      }
+
+      const systemPrompt = `You are a creative WhatsApp sticker designer. Generate fun, expressive sticker pack content based on a user's idea.
+
+Return a JSON object with this exact structure:
+{
+  "title": "Short catchy sticker pack title (2-4 words)",
+  "text": "Main sticker text or catchphrase (max 8 words, punchy)",
+  "emojis": "3-5 relevant emojis that match the theme",
+  "tags": ["tag1", "tag2", "tag3", "tag4", "tag5", "tag6"]
+}
+
+Rules for tags: short 1-3 word phrases that would make great mini stickers for this pack theme (funny reactions, expressions, moods).`;
+
+      const response = await openai.chat.completions.create({
+        model: "gpt-4o-mini",
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: `Create a WhatsApp sticker pack for: ${prompt}` },
+        ],
+        response_format: { type: "json_object" },
+        max_tokens: 400,
+        temperature: 1.0,
+      });
+
+      const content = response.choices[0]?.message?.content || "{}";
+      const parsed = JSON.parse(content);
+
+      return res.json(parsed);
+    } catch (error) {
+      console.error("Error generating sticker:", error);
+      return res.status(500).json({ error: "Failed to generate sticker" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

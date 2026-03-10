@@ -1,0 +1,232 @@
+Upgrade the existing React Native Android application "WhatsToolbox" by adding **Phase 2 features**. These features should be implemented as new modules inside the app. The goal is to provide advanced WhatsApp-related utilities while maintaining performance and a simple user interface.
+
+Platform: React Native (Android first)
+
+Architecture: Modular feature-based structure.
+
+---
+
+FEATURE 1: WhatsApp Chat Backup Viewer
+
+Purpose:
+Allow users to open and read exported WhatsApp chat backup files.
+
+Requirements:
+
+1. Allow users to import chat backup files (.txt format).
+2. Parse the chat file and display messages in a chat-style UI.
+3. Detect message structure:
+
+Example format:
+[12/02/2024, 10:30] John: Hello
+
+4. Separate messages into:
+
+* sender name
+* timestamp
+* message text
+
+5. Display messages in a chat interface similar to messaging apps.
+
+6. Add features:
+
+* search inside chat
+* copy message
+* export chat summary
+
+Libraries that may be used:
+react-native-document-picker
+react-native-fs
+
+---
+
+FEATURE 2: Status Analytics
+
+Purpose:
+Give insights about the user’s WhatsApp status usage.
+
+Requirements:
+
+1. Scan saved statuses from the app folder:
+   /Pictures/WhatsToolbox/
+
+2. Generate analytics such as:
+
+* total statuses saved
+* image vs video count
+* most active day
+* storage used by statuses
+
+3. Display analytics using charts.
+
+Suggested libraries:
+react-native-chart-kit
+victory-native
+
+Analytics screen should include:
+
+* pie chart (images vs videos)
+* bar chart (statuses per day)
+* storage usage indicator
+
+---
+
+FEATURE 3: AI Sticker Generator
+
+Purpose:
+Allow users to create stickers using AI tools.
+
+Requirements:
+
+1. User can input:
+
+* text prompt
+  or
+* upload an image
+
+2. If image is uploaded:
+
+* remove background
+* crop to square
+* convert to sticker format
+
+3. Generate sticker pack.
+
+4. Export sticker pack to WhatsApp.
+
+Features:
+
+* sticker preview
+* sticker pack name
+* add multiple stickers
+* export pack to WhatsApp
+
+Libraries:
+react-native-image-picker
+react-native-image-crop-picker
+
+Optional AI integration:
+OpenAI or Stable Diffusion API.
+
+---
+
+FEATURE 4: Chat Organizer
+
+Purpose:
+Help users organize and manage their WhatsApp chats.
+
+Requirements:
+
+1. Allow users to create chat categories such as:
+
+* Work
+* Friends
+* Family
+* Important
+
+2. User can add contacts to categories.
+
+3. Provide quick shortcuts to open chats.
+
+4. Features include:
+
+* favorite contacts
+* quick open chat
+* pinned chat shortcuts
+
+Opening chat should use WhatsApp deep links.
+
+Example:
+https://wa.me/phone_number
+
+---
+
+FEATURE 5: Media Cleaner
+
+Purpose:
+Help users free storage by cleaning unnecessary WhatsApp media files.
+
+Requirements:
+
+1. Scan WhatsApp media folders:
+
+Images
+Videos
+Documents
+Voice notes
+
+Typical directory example:
+/Android/media/com.whatsapp/WhatsApp/Media/
+
+2. Show statistics:
+
+* total media files
+* total storage used
+* largest files
+
+3. Provide cleaning options:
+
+* delete duplicate files
+* delete large files
+* delete old media (30+ days)
+
+4. Add a preview before deletion.
+
+Libraries:
+react-native-fs
+
+---
+
+APP INTEGRATION
+
+Add a new section in the app dashboard called:
+
+"Advanced Tools"
+
+This section should include:
+
+* Chat Backup Viewer
+* Status Analytics
+* AI Sticker Generator
+* Chat Organizer
+* Media Cleaner
+
+---
+
+UI DESIGN REQUIREMENTS
+
+Use clean card-style layout.
+
+Each tool should have:
+
+* icon
+* title
+* short description
+* open button
+
+Maintain consistent color theme:
+
+Primary color:
+#25D366
+
+Dark mode support required.
+
+---
+
+PERFORMANCE REQUIREMENTS
+
+* Lazy load large media files.
+* Avoid scanning unnecessary folders.
+* Use background tasks when scanning files.
+
+---
+
+EXPECTED OUTPUT
+
+Provide:
+
+1. Folder structure for Phase 2 features
+2. React Native screens for each tool
+3. Utility functions for file scanning
+4. UI components
+5. Navigation integration

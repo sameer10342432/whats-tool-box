@@ -100,6 +100,54 @@ const TOOLS: Tool[] = [
   },
 ];
 
+const ADVANCED_TOOLS: Tool[] = [
+  {
+    id: "chat-backup",
+    title: "Chat Backup",
+    description: "Read exported chat files",
+    icon: "document-text",
+    iconLib: "ionicons",
+    color: "#6366F1",
+    route: "/chat-backup",
+  },
+  {
+    id: "status-analytics",
+    title: "Status Analytics",
+    description: "Insights & storage stats",
+    icon: "bar-chart",
+    iconLib: "ionicons",
+    color: "#0EA5E9",
+    route: "/status-analytics",
+  },
+  {
+    id: "ai-sticker",
+    title: "AI Sticker",
+    description: "Generate sticker packs",
+    icon: "happy",
+    iconLib: "ionicons",
+    color: "#EC4899",
+    route: "/ai-sticker",
+  },
+  {
+    id: "chat-organizer",
+    title: "Chat Organizer",
+    description: "Organize chats by category",
+    icon: "folder-open",
+    iconLib: "ionicons",
+    color: "#F97316",
+    route: "/chat-organizer",
+  },
+  {
+    id: "media-cleaner",
+    title: "Media Cleaner",
+    description: "Free up storage space",
+    icon: "trash-bin",
+    iconLib: "ionicons",
+    color: "#EF4444",
+    route: "/media-cleaner",
+  },
+];
+
 function ToolIcon({ tool }: { tool: Tool }) {
   if (tool.iconLib === "mci") {
     return (
@@ -111,6 +159,28 @@ function ToolIcon({ tool }: { tool: Tool }) {
     );
   }
   return <Ionicons name={tool.icon as any} size={28} color="#fff" />;
+}
+
+function AdvancedToolRow({ tool }: { tool: Tool }) {
+  const colorScheme = useColorScheme();
+  const isDark = colorScheme === "dark";
+  const theme = isDark ? Colors.dark : Colors.light;
+  return (
+    <TouchableOpacity
+      style={[styles.advRow, { backgroundColor: theme.card }]}
+      onPress={() => router.push(tool.route as any)}
+      activeOpacity={0.8}
+    >
+      <View style={[styles.advIcon, { backgroundColor: tool.color }]}>
+        <ToolIcon tool={tool} />
+      </View>
+      <View style={styles.advText}>
+        <Text style={[styles.advTitle, { color: theme.text }]}>{tool.title}</Text>
+        <Text style={[styles.advDesc, { color: theme.textSecondary }]}>{tool.description}</Text>
+      </View>
+      <Ionicons name="chevron-forward" size={18} color={theme.textSecondary} />
+    </TouchableOpacity>
+  );
 }
 
 export default function HomeScreen() {
@@ -125,7 +195,7 @@ export default function HomeScreen() {
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
       <StatusBar
-        barStyle={isDark ? "light-content" : "light-content"}
+        barStyle="light-content"
         backgroundColor={Colors.deepDark}
       />
 
@@ -152,6 +222,7 @@ export default function HomeScreen() {
         contentContainerStyle={[styles.scroll, { paddingBottom: bottomPad + 90 }]}
         showsVerticalScrollIndicator={false}
       >
+        {/* Core Tools */}
         <Text style={[styles.sectionTitle, { color: theme.textSecondary }]}>
           ALL TOOLS
         </Text>
@@ -180,6 +251,22 @@ export default function HomeScreen() {
                 {tool.description}
               </Text>
             </TouchableOpacity>
+          ))}
+        </View>
+
+        {/* Advanced Tools */}
+        <View style={styles.advancedHeader}>
+          <Text style={[styles.sectionTitle, { color: theme.textSecondary, marginBottom: 0 }]}>
+            ADVANCED TOOLS
+          </Text>
+          <View style={styles.advBadge}>
+            <Text style={styles.advBadgeText}>Phase 2</Text>
+          </View>
+        </View>
+
+        <View style={styles.advGrid}>
+          {ADVANCED_TOOLS.map((tool) => (
+            <AdvancedToolRow key={tool.id} tool={tool} />
           ))}
         </View>
 
@@ -314,6 +401,50 @@ const styles = StyleSheet.create({
     fontFamily: "Inter_400Regular",
     lineHeight: 17,
   },
+  advancedHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    marginTop: 28,
+    marginBottom: 14,
+    marginLeft: 4,
+  },
+  advBadge: {
+    backgroundColor: Colors.primary + "25",
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 8,
+  },
+  advBadgeText: {
+    color: Colors.primary,
+    fontSize: 11,
+    fontFamily: "Inter_600SemiBold",
+  },
+  advGrid: {
+    gap: 10,
+  },
+  advRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderRadius: 16,
+    padding: 14,
+    gap: 14,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 6,
+    elevation: 2,
+  },
+  advIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 13,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  advText: { flex: 1 },
+  advTitle: { fontSize: 15, fontFamily: "Inter_600SemiBold", marginBottom: 3 },
+  advDesc: { fontSize: 12, fontFamily: "Inter_400Regular" },
   quickAction: {
     flexDirection: "row",
     alignItems: "center",
