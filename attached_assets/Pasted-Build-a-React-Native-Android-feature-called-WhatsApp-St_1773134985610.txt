@@ -1,0 +1,107 @@
+Build a **React Native Android feature called "WhatsApp Status Saver"**.
+
+Goal:
+The app should automatically detect WhatsApp statuses and show them inside the app. Users should be able to press a **Save button** to download the status to the phone gallery.
+
+Requirements:
+
+1. Detect WhatsApp Status Folder
+   The app should read files from the WhatsApp statuses directory on Android.
+
+Path:
+/Android/media/com.whatsapp/WhatsApp/Media/.Statuses
+
+This folder contains temporary WhatsApp status images and videos.
+
+2. Permissions
+   Request required permissions for Android:
+
+* READ_MEDIA_IMAGES
+* READ_MEDIA_VIDEO
+* READ_EXTERNAL_STORAGE (for older Android versions)
+
+The app must properly request permissions before accessing files.
+
+3. Fetch Status Files
+   Scan the status folder and load all media files including:
+
+* .jpg
+* .png
+* .mp4
+
+Display them inside the app in a **grid layout**.
+
+4. Status Viewer UI
+   Create two tabs:
+
+Images Tab
+Show image statuses.
+
+Videos Tab
+Show video statuses.
+
+Use a **FlatList grid layout** with thumbnails.
+
+5. Save Status Button
+   Each status item should contain:
+
+* Preview thumbnail
+* Save button
+* Share button
+
+When the user clicks **Save**, copy the selected file to a new folder:
+
+/Pictures/WhatsToolbox/
+
+6. Save to Gallery
+   Use react-native-fs or MediaStore API to save files so they appear in the device gallery.
+
+7. Required Libraries
+
+Install and configure these packages:
+
+react-native-fs
+react-native-permissions
+react-native-video
+react-native-media-library
+
+8. UI Behavior
+
+Home Screen → Status Saver → Show Status Grid
+
+When user taps a status:
+
+* open full preview
+* show Save button
+
+9. Error Handling
+
+If the WhatsApp status folder is empty, show message:
+
+"No statuses found. Open WhatsApp and view some statuses first."
+
+10. Performance
+
+* Load thumbnails efficiently
+* Avoid loading large videos directly
+* Use caching where possible
+
+11. Folder Structure Example
+
+src/
+screens/
+StatusSaverScreen.js
+components/
+StatusItem.js
+utils/
+statusScanner.js
+
+12. Output Expected
+
+Provide full working code for:
+
+* Status scanning function
+* Permission request
+* Grid UI screen
+* Save status function
+* File copy to gallery

@@ -19,6 +19,12 @@
     },
     "android": {
       "package": "com.myapp",
+      "permissions": [
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE",
+        "READ_MEDIA_IMAGES",
+        "READ_MEDIA_VIDEO"
+      ],
       "adaptiveIcon": {
         "backgroundColor": "#075E54",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
@@ -37,7 +43,15 @@
         }
       ],
       "expo-font",
-      "expo-web-browser"
+      "expo-web-browser",
+      [
+        "expo-media-library",
+        {
+          "photosPermission": "Allow WhatsToolbox to access your photos.",
+          "savePhotosPermission": "Allow WhatsToolbox to save statuses to your gallery.",
+          "isAccessMediaLocationEnabled": true
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

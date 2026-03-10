@@ -1,39 +1,46 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
-  useColorScheme,
   FlatList,
   Image,
   Alert,
   Platform,
-  ActivityIndicator,
   Modal,
   Dimensions,
+  RefreshControl,
   Share,
+  ActivityIndicator,
+  useColorScheme,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
-import * as ImagePicker from "expo-image-picker";
+import * as FileSystem from "expo-file-system";
+import * as MediaLibrary from "expo-media-library";
 import * as Haptics from "expo-haptics";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import Colors from "@/constants/colors";
 
 const { width: SCREEN_W } = Dimensions.get("window");
-const ITEM_SIZE = (SCREEN_W - 4) / 3;
-const STORAGE_KEY = "saved_statuses";
-const BROWSE_CACHE_KEY = "browse_cache";
+const ITEM_SIZE = (SCREEN_W - 6) / 3;
 
-type MediaItem = {
-  id: string;
+const WHATSAPP_PATHS = [
+  "file:///storage/emulated/0/Android/media/com.whatsapp/WhatsApp/Media/.Statuses/",
+  "file:///storage/emulated/0/WhatsApp/Media/.Statuses/",
+  "file:///storage/emulated/0/Android/media/com.whatsapp.w4b/WhatsApp Business/Media/.Statuses/",
+];
+
+const IMAGE_EXTS = [".jpg", ".jpeg", ".png", ".webp"];
+const VIDEO_EXTS = [".mp4", ".3gp", ".mkv", ".mov"];
+
+type StatusFile = {
   uri: string;
+  filename: string;
   type: "image" | "video";
-  duration?: number;
 };
 
-type SavedItem = MediaItem & { savedAt: string };
+type TabType = "images" | "videos";
 
 export default function StatusScreen() {
   const colorScheme = useColorScheme();
@@ -41,169 +48,263 @@ export default function StatusScreen() {
   const insets = useSafeAreaInsets();
   const theme = isDark ? Colors.dark : Colors.light;
 
-  const [activeTab, setActiveTab] = useState<"browse" | "saved">("browse");
-  const [browseItems, setBrowseItems] = useState<MediaItem[]>([]);
-  const [savedItems, setSavedItems] = useState<SavedItem[]>([]);
-  const [savedIds, setSavedIds] = useState<Set<string>>(new Set());
+  const [activeTab, setActiveTab] = useState<TabType>("images");
+  const [images, setImages] = useState<StatusFile[]>([]);
+  const [videos, setVideos] = useState<StatusFile[]>([]);
   const [loading, setLoading] = useState(false);
-  const [selected, setSelected] = useState<MediaItem | null>(null);
-  const [selectedMode, setSelectedMode] = useState<"browse" | "saved">("browse");
+  const [refreshing, setRefreshing] = useState(false);
+  const [error, setError] = useState<"no_folder" | "permission" | "expo_go" | null>(null);
+  const [selected, setSelected] = useState<StatusFile | null>(null);
+  const [savedSet, setSavedSet] = useState<Set<string>>(new Set());
   const [saving, setSaving] = useState(false);
 
   const topPad = Platform.OS === "web" ? 67 : insets.top;
   const bottomPad = Platform.OS === "web" ? 34 : insets.bottom;
 
   useEffect(() => {
-    loadSaved();
-    loadBrowseCache();
+    if (Platform.OS === "android") {
+      scanStatuses();
+    }
   }, []);
 
-  async function loadSaved() {
+  async function scanStatuses(isRefresh = false) {
+    if (Platform.OS !== "android") return;
+
+    if (isRefresh) {
+      setRefreshing(true);
+    } else {
+      setLoading(true);
+    }
+    setError(null);
+
     try {
-      const raw = await AsyncStorage.getItem(STORAGE_KEY);
-      if (raw) {
-        const items: SavedItem[] = JSON.parse(raw);
-        setSavedItems(items);
-        setSavedIds(new Set(items.map((s) => s.id)));
+      let foundPath: string | null = null;
+      let allFiles: string[] = [];
+
+      for (const path of WHATSAPP_PATHS) {
+        try {
+          const info = await FileSystem.getInfoAsync(path);
+          if (info.exists) {
+            const files = await FileSystem.readDirectoryAsync(path);
+            if (files.length > 0) {
+              foundPath = path;
+              allFiles = files;
+              break;
+            }
+          }
+        } catch {}
       }
-    } catch {}
-  }
 
-  async function loadBrowseCache() {
-    try {
-      const raw = await AsyncStorage.getItem(BROWSE_CACHE_KEY);
-      if (raw) setBrowseItems(JSON.parse(raw));
-    } catch {}
-  }
-
-  async function openGallery() {
-    setLoading(true);
-    try {
-      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (status !== "granted") {
-        Alert.alert(
-          "Permission Required",
-          "Please allow gallery access to browse and save statuses."
-        );
-        setLoading(false);
+      if (!foundPath) {
+        setError("no_folder");
+        setImages([]);
+        setVideos([]);
         return;
       }
 
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ["images", "videos"],
-        allowsMultipleSelection: true,
-        quality: 1,
-      });
+      const imgs: StatusFile[] = [];
+      const vids: StatusFile[] = [];
 
-      if (!result.canceled && result.assets.length > 0) {
-        const newItems: MediaItem[] = result.assets.map((asset) => ({
-          id: asset.assetId || (Date.now().toString() + Math.random().toString(36).substr(2, 9)),
-          uri: asset.uri,
-          type: asset.type === "video" ? "video" : "image",
-          duration: asset.duration ?? undefined,
-        }));
-        setBrowseItems(newItems);
-        await AsyncStorage.setItem(BROWSE_CACHE_KEY, JSON.stringify(newItems));
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      for (const filename of allFiles) {
+        const lower = filename.toLowerCase();
+        const uri = foundPath + filename;
+
+        if (IMAGE_EXTS.some((ext) => lower.endsWith(ext))) {
+          imgs.push({ uri, filename, type: "image" });
+        } else if (VIDEO_EXTS.some((ext) => lower.endsWith(ext))) {
+          vids.push({ uri, filename, type: "video" });
+        }
       }
-    } catch (e) {
-      Alert.alert("Error", "Failed to open gallery.");
+
+      setImages(imgs);
+      setVideos(vids);
+    } catch (e: any) {
+      const msg = e?.message || "";
+      if (msg.includes("permission") || msg.includes("Permission")) {
+        setError("permission");
+      } else {
+        setError("no_folder");
+      }
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   }
 
-  async function saveItem(item: MediaItem) {
-    if (savedIds.has(item.id)) {
-      Alert.alert("Already Saved", "This status is already in your gallery.");
+  async function saveStatus(file: StatusFile) {
+    if (savedSet.has(file.uri)) {
+      Alert.alert("Already Saved", "This status is already saved to your gallery.");
       return;
     }
     setSaving(true);
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    const newSaved: SavedItem = { ...item, savedAt: new Date().toISOString() };
-    const updated = [newSaved, ...savedItems];
-    setSavedItems(updated);
-    setSavedIds(new Set(updated.map((s) => s.id)));
-    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-    setSaving(false);
-  }
-
-  async function deleteSaved(id: string) {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    const updated = savedItems.filter((s) => s.id !== id);
-    setSavedItems(updated);
-    setSavedIds(new Set(updated.map((s) => s.id)));
-    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-    if (selected?.id === id) setSelected(null);
-  }
-
-  async function shareItem(uri: string) {
     try {
-      await Share.share({ url: uri });
+      const asset = await MediaLibrary.createAssetAsync(file.uri);
+      const album = await MediaLibrary.getAlbumAsync("WhatsToolbox");
+      if (album) {
+        await MediaLibrary.addAssetsToAlbumAsync([asset], album, false);
+      } else {
+        await MediaLibrary.createAlbumAsync("WhatsToolbox", asset, false);
+      }
+      setSavedSet((prev) => new Set([...prev, file.uri]));
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      Alert.alert("Saved!", "Status saved to WhatsToolbox album in your gallery.");
+    } catch (e: any) {
+      const msg = e?.message || "";
+      if (msg.includes("permission") || msg.includes("Permission")) {
+        Alert.alert(
+          "Permission Required",
+          "Please allow WhatsToolbox to save photos in your device settings."
+        );
+      } else {
+        Alert.alert("Error", "Could not save status. Please try again.");
+      }
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function shareStatus(file: StatusFile) {
+    try {
+      await Share.share({
+        url: file.uri,
+        title: "Share Status",
+      });
     } catch {}
   }
 
-  function formatDuration(secs?: number) {
-    if (!secs) return "";
-    const m = Math.floor(secs / 60);
-    const s = Math.floor(secs % 60);
-    return `${m}:${s.toString().padStart(2, "0")}`;
-  }
+  const onRefresh = useCallback(() => {
+    scanStatuses(true);
+  }, []);
 
-  const renderBrowseItem = ({ item }: { item: MediaItem }) => {
-    const saved = savedIds.has(item.id);
+  const data = activeTab === "images" ? images : videos;
+
+  const renderItem = ({ item }: { item: StatusFile }) => {
+    const isSaved = savedSet.has(item.uri);
     return (
       <TouchableOpacity
         style={styles.gridItem}
-        onPress={() => { setSelected(item); setSelectedMode("browse"); }}
+        onPress={() => setSelected(item)}
         activeOpacity={0.85}
       >
-        <Image source={{ uri: item.uri }} style={styles.gridImage} />
+        <Image source={{ uri: item.uri }} style={styles.gridImage} resizeMode="cover" />
+
         {item.type === "video" && (
-          <View style={styles.videoBadge}>
-            <Ionicons name="play" size={10} color="#fff" />
-            {!!item.duration && (
-              <Text style={styles.durText}>{formatDuration(item.duration)}</Text>
-            )}
+          <View style={styles.playBadge}>
+            <Ionicons name="play" size={14} color="#fff" />
           </View>
         )}
-        {saved && (
-          <View style={styles.checkBadge}>
-            <Ionicons name="checkmark" size={11} color="#fff" />
+
+        {isSaved && (
+          <View style={styles.savedCheck}>
+            <Ionicons name="checkmark" size={12} color="#fff" />
           </View>
         )}
+
+        <TouchableOpacity
+          style={styles.saveQuick}
+          onPress={() => saveStatus(item)}
+          hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+        >
+          <Ionicons
+            name={isSaved ? "checkmark-circle" : "download"}
+            size={20}
+            color={isSaved ? Colors.primary : "#fff"}
+          />
+        </TouchableOpacity>
       </TouchableOpacity>
     );
   };
 
-  const renderSavedItem = ({ item }: { item: SavedItem }) => (
-    <TouchableOpacity
-      style={styles.gridItem}
-      onPress={() => { setSelected(item); setSelectedMode("saved"); }}
-      activeOpacity={0.85}
-    >
-      <Image source={{ uri: item.uri }} style={styles.gridImage} />
-      {item.type === "video" && (
-        <View style={styles.videoBadge}>
-          <Ionicons name="play" size={10} color="#fff" />
+  function renderEmptyOrError() {
+    if (Platform.OS === "web") {
+      return (
+        <View style={styles.center}>
+          <Ionicons name="phone-portrait-outline" size={60} color={theme.textSecondary} />
+          <Text style={[styles.emptyTitle, { color: theme.text }]}>Android Only</Text>
+          <Text style={[styles.emptyText, { color: theme.textSecondary }]}>
+            Status Saver works on Android devices only. Open WhatsApp, view some statuses, then come
+            back here.
+          </Text>
         </View>
-      )}
-      <TouchableOpacity
-        style={styles.deleteMini}
-        onPress={() =>
-          Alert.alert("Delete", "Remove from saved gallery?", [
-            { text: "Cancel", style: "cancel" },
-            { text: "Delete", style: "destructive", onPress: () => deleteSaved(item.id) },
-          ])
-        }
-        hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-      >
-        <Ionicons name="close-circle" size={20} color="#fff" />
-      </TouchableOpacity>
-    </TouchableOpacity>
-  );
+      );
+    }
 
-  const isSaved = selected ? savedIds.has(selected.id) : false;
+    if (Platform.OS === "ios") {
+      return (
+        <View style={styles.center}>
+          <Ionicons name="logo-android" size={60} color={theme.textSecondary} />
+          <Text style={[styles.emptyTitle, { color: theme.text }]}>Android Only</Text>
+          <Text style={[styles.emptyText, { color: theme.textSecondary }]}>
+            WhatsApp Status Saver is only available on Android devices.
+          </Text>
+        </View>
+      );
+    }
+
+    if (error === "permission") {
+      return (
+        <View style={styles.center}>
+          <View style={[styles.iconCircle, { backgroundColor: "#EF4444" }]}>
+            <Ionicons name="lock-closed" size={36} color="#fff" />
+          </View>
+          <Text style={[styles.emptyTitle, { color: theme.text }]}>Permission Required</Text>
+          <Text style={[styles.emptyText, { color: theme.textSecondary }]}>
+            WhatsToolbox needs storage access to read WhatsApp statuses. Please grant permission in
+            Settings.
+          </Text>
+          <TouchableOpacity style={styles.actionButton} onPress={() => scanStatuses()}>
+            <Text style={styles.actionButtonText}>Try Again</Text>
+          </TouchableOpacity>
+        </View>
+      );
+    }
+
+    if (error === "no_folder") {
+      return (
+        <View style={styles.center}>
+          <View style={[styles.iconCircle, { backgroundColor: Colors.primary }]}>
+            <Ionicons name="logo-whatsapp" size={36} color="#fff" />
+          </View>
+          <Text style={[styles.emptyTitle, { color: theme.text }]}>No Statuses Found</Text>
+          <Text style={[styles.emptyText, { color: theme.textSecondary }]}>
+            Open WhatsApp and view some statuses first, then come back here to save them.
+          </Text>
+          <TouchableOpacity style={styles.actionButton} onPress={() => scanStatuses()}>
+            <Ionicons name="refresh" size={16} color="#fff" />
+            <Text style={styles.actionButtonText}>Refresh</Text>
+          </TouchableOpacity>
+          <View style={[styles.noteBanner, { backgroundColor: isDark ? "#1A2A1A" : "#F0FFF4" }]}>
+            <Ionicons name="information-circle-outline" size={16} color={Colors.primary} />
+            <Text style={[styles.noteText, { color: theme.textSecondary }]}>
+              Note: This feature requires a production build of the app (not Expo Go) to access
+              WhatsApp's media folder.
+            </Text>
+          </View>
+        </View>
+      );
+    }
+
+    if (data.length === 0 && !loading) {
+      return (
+        <View style={styles.center}>
+          <Ionicons
+            name={activeTab === "images" ? "images-outline" : "videocam-outline"}
+            size={60}
+            color={theme.textSecondary}
+          />
+          <Text style={[styles.emptyTitle, { color: theme.text }]}>
+            No {activeTab === "images" ? "Image" : "Video"} Statuses
+          </Text>
+          <Text style={[styles.emptyText, { color: theme.textSecondary }]}>
+            No {activeTab === "images" ? "image" : "video"} statuses were found. Open WhatsApp and
+            view some statuses.
+          </Text>
+        </View>
+      );
+    }
+
+    return null;
+  }
 
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
@@ -216,110 +317,83 @@ export default function StatusScreen() {
       >
         <View style={styles.headerRow}>
           <Text style={[styles.headerTitle, { color: theme.text }]}>Status Saver</Text>
-          {activeTab === "browse" && browseItems.length > 0 && (
+          {Platform.OS === "android" && !error && (
             <TouchableOpacity
               style={styles.refreshBtn}
-              onPress={openGallery}
-              disabled={loading}
+              onPress={() => scanStatuses(true)}
+              disabled={refreshing || loading}
             >
-              <Ionicons name="refresh" size={18} color={Colors.primary} />
+              <Ionicons name="refresh" size={20} color={Colors.primary} />
             </TouchableOpacity>
           )}
         </View>
-        <View style={[styles.tabBar, { backgroundColor: isDark ? Colors.dark.background : "#F3F4F6" }]}>
-          {(["browse", "saved"] as const).map((tab) => (
-            <TouchableOpacity
-              key={tab}
-              style={[styles.tabBtn, activeTab === tab && { backgroundColor: Colors.primary }]}
-              onPress={() => {
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                setActiveTab(tab);
-                if (tab === "saved") loadSaved();
-              }}
-            >
-              <Text style={[styles.tabLabel, { color: activeTab === tab ? "#fff" : theme.textSecondary }]}>
-                {tab === "browse" ? "Browse" : `Saved (${savedItems.length})`}
-              </Text>
-            </TouchableOpacity>
-          ))}
+
+        {/* Tabs */}
+        <View style={[styles.tabRow, { backgroundColor: isDark ? Colors.dark.background : "#F3F4F6" }]}>
+          {(["images", "videos"] as const).map((tab) => {
+            const count = tab === "images" ? images.length : videos.length;
+            const isActive = activeTab === tab;
+            return (
+              <TouchableOpacity
+                key={tab}
+                style={[styles.tabBtn, isActive && { backgroundColor: Colors.primary }]}
+                onPress={() => {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  setActiveTab(tab);
+                }}
+              >
+                <Ionicons
+                  name={tab === "images" ? "image" : "videocam"}
+                  size={14}
+                  color={isActive ? "#fff" : theme.textSecondary}
+                />
+                <Text style={[styles.tabLabel, { color: isActive ? "#fff" : theme.textSecondary }]}>
+                  {tab === "images" ? "Images" : "Videos"}
+                  {count > 0 ? ` (${count})` : ""}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
         </View>
       </View>
 
-      {/* Browse Tab */}
-      {activeTab === "browse" && (
-        browseItems.length === 0 ? (
-          <View style={styles.emptyBrowse}>
-            <View style={styles.permIcon}>
-              <Ionicons name="images" size={40} color="#fff" />
-            </View>
-            <Text style={[styles.permTitle, { color: theme.text }]}>Browse Your Gallery</Text>
-            <Text style={[styles.permText, { color: theme.textSecondary }]}>
-              Open your gallery to browse photos and videos. Tap any item to preview and save it.
-            </Text>
-            <TouchableOpacity
-              style={[styles.loadBtn, { opacity: loading ? 0.7 : 1 }]}
-              onPress={openGallery}
-              disabled={loading}
-              activeOpacity={0.85}
-            >
-              {loading ? (
-                <ActivityIndicator color="#fff" size="small" />
-              ) : (
-                <>
-                  <Ionicons name="folder-open" size={20} color="#fff" />
-                  <Text style={styles.loadBtnText}>Open Gallery</Text>
-                </>
-              )}
-            </TouchableOpacity>
-          </View>
-        ) : (
-          <FlatList
-            data={browseItems}
-            keyExtractor={(item) => item.id}
-            renderItem={renderBrowseItem}
-            numColumns={3}
-            contentContainerStyle={[styles.grid, { paddingBottom: bottomPad + 90 }]}
-            columnWrapperStyle={styles.gridRow}
-            showsVerticalScrollIndicator={false}
-            ListHeaderComponent={
-              <Text style={[styles.countLabel, { color: theme.textSecondary }]}>
-                {browseItems.length} items loaded — tap to preview & save
-              </Text>
-            }
-          />
-        )
-      )}
-
-      {/* Saved Tab */}
-      {activeTab === "saved" && (
+      {/* Content */}
+      {loading ? (
+        <View style={styles.center}>
+          <ActivityIndicator size="large" color={Colors.primary} />
+          <Text style={[styles.emptyText, { color: theme.textSecondary, marginTop: 14 }]}>
+            Scanning WhatsApp statuses...
+          </Text>
+        </View>
+      ) : error || (Platform.OS !== "android") || data.length === 0 ? (
+        renderEmptyOrError()
+      ) : (
         <FlatList
-          data={savedItems}
-          keyExtractor={(item) => item.id}
-          renderItem={renderSavedItem}
+          data={data}
+          keyExtractor={(item) => item.uri}
+          renderItem={renderItem}
           numColumns={3}
-          contentContainerStyle={[styles.grid, { paddingBottom: bottomPad + 90 }]}
           columnWrapperStyle={styles.gridRow}
+          contentContainerStyle={[styles.grid, { paddingBottom: bottomPad + 90 }]}
           showsVerticalScrollIndicator={false}
-          ListHeaderComponent={
-            savedItems.length > 0 ? (
-              <Text style={[styles.countLabel, { color: theme.textSecondary }]}>
-                {savedItems.length} item{savedItems.length !== 1 ? "s" : ""} saved
-              </Text>
-            ) : null
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              tintColor={Colors.primary}
+              colors={[Colors.primary]}
+            />
           }
-          ListEmptyComponent={
-            <View style={styles.emptyState}>
-              <Ionicons name="bookmark-outline" size={56} color={theme.textSecondary} />
-              <Text style={[styles.emptyTitle, { color: theme.text }]}>Nothing saved yet</Text>
-              <Text style={[styles.emptyText, { color: theme.textSecondary }]}>
-                Browse gallery and tap any item to save
-              </Text>
-            </View>
+          ListHeaderComponent={
+            <Text style={[styles.countLabel, { color: theme.textSecondary }]}>
+              {data.length} {activeTab === "images" ? "image" : "video"} status
+              {data.length !== 1 ? "es" : ""} found — tap to preview
+            </Text>
           }
         />
       )}
 
-      {/* Fullscreen Preview */}
+      {/* Fullscreen Preview Modal */}
       <Modal
         visible={!!selected}
         transparent
@@ -335,65 +409,51 @@ export default function StatusScreen() {
           </TouchableOpacity>
 
           {selected && (
-            <Image source={{ uri: selected.uri }} style={styles.fullImg} resizeMode="contain" />
-          )}
+            <>
+              <Image
+                source={{ uri: selected.uri }}
+                style={styles.fullImg}
+                resizeMode="contain"
+              />
 
-          <View style={[styles.modalActions, { paddingBottom: insets.bottom + 16 }]}>
-            {selectedMode === "browse" && !isSaved && (
-              <TouchableOpacity
-                style={styles.actionBtn}
-                onPress={async () => {
-                  if (selected) {
-                    await saveItem(selected);
+              <View style={[styles.modalBar, { paddingBottom: insets.bottom + 16 }]}>
+                <TouchableOpacity
+                  style={[
+                    styles.modalBtn,
+                    savedSet.has(selected.uri) && { backgroundColor: "rgba(255,255,255,0.15)" },
+                  ]}
+                  onPress={() => {
+                    saveStatus(selected);
                     setSelected(null);
-                    setActiveTab("saved");
-                  }
-                }}
-                disabled={saving}
-              >
-                {saving ? (
-                  <ActivityIndicator color="#fff" size="small" />
-                ) : (
-                  <Ionicons name="bookmark" size={22} color="#fff" />
-                )}
-                <Text style={styles.actionText}>{saving ? "Saving..." : "Save"}</Text>
-              </TouchableOpacity>
-            )}
+                  }}
+                  disabled={saving || savedSet.has(selected.uri)}
+                >
+                  {saving ? (
+                    <ActivityIndicator color="#fff" size="small" />
+                  ) : (
+                    <Ionicons
+                      name={savedSet.has(selected.uri) ? "checkmark-circle" : "download"}
+                      size={22}
+                      color={savedSet.has(selected.uri) ? Colors.primary : "#fff"}
+                    />
+                  )}
+                  <Text style={styles.modalBtnText}>
+                    {savedSet.has(selected.uri) ? "Saved" : saving ? "Saving..." : "Save"}
+                  </Text>
+                </TouchableOpacity>
 
-            {selectedMode === "browse" && isSaved && (
-              <View style={[styles.actionBtn, { backgroundColor: "rgba(255,255,255,0.15)" }]}>
-                <Ionicons name="checkmark-circle" size={22} color={Colors.primary} />
-                <Text style={styles.actionText}>Saved</Text>
+                <TouchableOpacity
+                  style={[styles.modalBtn, { backgroundColor: "rgba(255,255,255,0.15)" }]}
+                  onPress={() => {
+                    shareStatus(selected);
+                  }}
+                >
+                  <Ionicons name="share-social" size={22} color="#fff" />
+                  <Text style={styles.modalBtnText}>Share</Text>
+                </TouchableOpacity>
               </View>
-            )}
-
-            <TouchableOpacity
-              style={[styles.actionBtn, { backgroundColor: "rgba(255,255,255,0.15)" }]}
-              onPress={() => selected && shareItem(selected.uri)}
-            >
-              <Ionicons name="share-social" size={22} color="#fff" />
-              <Text style={styles.actionText}>Share</Text>
-            </TouchableOpacity>
-
-            {selectedMode === "saved" && (
-              <TouchableOpacity
-                style={[styles.actionBtn, { backgroundColor: "#EF4444" }]}
-                onPress={() => {
-                  Alert.alert("Delete", "Remove from saved gallery?", [
-                    { text: "Cancel", style: "cancel" },
-                    {
-                      text: "Delete",
-                      style: "destructive",
-                      onPress: () => deleteSaved(selected!.id),
-                    },
-                  ]);
-                }}
-              >
-                <Ionicons name="trash" size={22} color="#fff" />
-                <Text style={styles.actionText}>Delete</Text>
-              </TouchableOpacity>
-            )}
-          </View>
+            </>
+          )}
         </View>
       </Modal>
     </View>
@@ -419,68 +479,84 @@ const styles = StyleSheet.create({
   },
   refreshBtn: {
     padding: 6,
-    borderRadius: 8,
   },
-  tabBar: {
+  tabRow: {
     flexDirection: "row",
     borderRadius: 10,
     padding: 3,
+    gap: 3,
   },
   tabBtn: {
     flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     paddingVertical: 8,
     borderRadius: 8,
-    alignItems: "center",
+    gap: 6,
   },
   tabLabel: {
     fontSize: 13,
     fontFamily: "Inter_600SemiBold",
   },
-  emptyBrowse: {
+  center: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    padding: 40,
-    gap: 16,
+    padding: 36,
+    gap: 14,
   },
-  permIcon: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: Colors.primary,
+  iconCircle: {
+    width: 76,
+    height: 76,
+    borderRadius: 38,
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 4,
   },
-  permTitle: {
+  emptyTitle: {
     fontSize: 20,
     fontFamily: "Inter_700Bold",
     textAlign: "center",
   },
-  permText: {
+  emptyText: {
     fontSize: 14,
     fontFamily: "Inter_400Regular",
     textAlign: "center",
     lineHeight: 22,
   },
-  loadBtn: {
-    backgroundColor: Colors.primary,
+  actionButton: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
-    paddingHorizontal: 36,
-    paddingVertical: 14,
-    borderRadius: 14,
-    gap: 10,
+    backgroundColor: Colors.primary,
+    paddingHorizontal: 28,
+    paddingVertical: 12,
+    borderRadius: 12,
+    gap: 8,
+    marginTop: 4,
+  },
+  actionButtonText: {
+    color: "#fff",
+    fontSize: 15,
+    fontFamily: "Inter_600SemiBold",
+  },
+  noteBanner: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    padding: 12,
+    borderRadius: 10,
+    gap: 8,
     marginTop: 8,
   },
-  loadBtnText: {
-    color: "#fff",
-    fontSize: 16,
-    fontFamily: "Inter_600SemiBold",
+  noteText: {
+    flex: 1,
+    fontSize: 12,
+    fontFamily: "Inter_400Regular",
+    lineHeight: 18,
   },
   grid: {
     paddingTop: 4,
+    paddingHorizontal: 2,
   },
   gridRow: {
     gap: 2,
@@ -495,27 +571,17 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
   },
-  videoBadge: {
+  playBadge: {
     position: "absolute",
-    bottom: 6,
-    left: 6,
-    backgroundColor: "rgba(0,0,0,0.65)",
-    borderRadius: 8,
-    paddingHorizontal: 5,
-    paddingVertical: 3,
-    flexDirection: "row",
+    inset: 0,
     alignItems: "center",
-    gap: 3,
+    justifyContent: "center",
+    backgroundColor: "rgba(0,0,0,0.3)",
   },
-  durText: {
-    color: "#fff",
-    fontSize: 10,
-    fontFamily: "Inter_500Medium",
-  },
-  checkBadge: {
+  savedCheck: {
     position: "absolute",
     top: 6,
-    right: 6,
+    left: 6,
     backgroundColor: Colors.primary,
     borderRadius: 10,
     width: 20,
@@ -523,33 +589,19 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  deleteMini: {
+  saveQuick: {
     position: "absolute",
-    top: 4,
-    right: 4,
+    bottom: 6,
+    right: 6,
+    backgroundColor: "rgba(0,0,0,0.55)",
+    borderRadius: 14,
+    padding: 4,
   },
   countLabel: {
     fontSize: 12,
     fontFamily: "Inter_400Regular",
-    paddingHorizontal: 12,
-    paddingBottom: 6,
-    paddingTop: 6,
-  },
-  emptyState: {
-    alignItems: "center",
-    justifyContent: "center",
-    paddingTop: 80,
-    gap: 10,
-  },
-  emptyTitle: {
-    fontSize: 18,
-    fontFamily: "Inter_600SemiBold",
-  },
-  emptyText: {
-    fontSize: 14,
-    fontFamily: "Inter_400Regular",
-    textAlign: "center",
-    paddingHorizontal: 40,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
   },
   modal: {
     flex: 1,
@@ -568,7 +620,7 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
   },
-  modalActions: {
+  modalBar: {
     position: "absolute",
     bottom: 0,
     left: 0,
@@ -577,9 +629,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 16,
     gap: 10,
-    backgroundColor: "rgba(0,0,0,0.5)",
+    backgroundColor: "rgba(0,0,0,0.55)",
   },
-  actionBtn: {
+  modalBtn: {
     flex: 1,
     flexDirection: "row",
     alignItems: "center",
@@ -589,7 +641,7 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     gap: 8,
   },
-  actionText: {
+  modalBtnText: {
     color: "#fff",
     fontSize: 15,
     fontFamily: "Inter_600SemiBold",
