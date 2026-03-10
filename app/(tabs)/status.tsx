@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -12,35 +12,28 @@ import {
   ActivityIndicator,
   Modal,
   Dimensions,
-  RefreshControl,
   Share,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
-import * as MediaLibrary from "expo-media-library";
+import * as ImagePicker from "expo-image-picker";
 import * as Haptics from "expo-haptics";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Colors from "@/constants/colors";
 
 const { width: SCREEN_W } = Dimensions.get("window");
-const STORAGE_KEY = "saved_statuses";
 const ITEM_SIZE = (SCREEN_W - 4) / 3;
+const STORAGE_KEY = "saved_statuses";
+const BROWSE_CACHE_KEY = "browse_cache";
 
-type StatusItem = {
+type MediaItem = {
   id: string;
   uri: string;
   type: "image" | "video";
-  savedAt: string;
   duration?: number;
 };
 
-type MediaAsset = {
-  id: string;
-  uri: string;
-  mediaType: string;
-  duration: number;
-  modificationTime: number;
-};
+type SavedItem = MediaItem & { savedAt: string };
 
 export default function StatusScreen() {
   const colorScheme = useColorScheme();
@@ -49,110 +42,101 @@ export default function StatusScreen() {
   const theme = isDark ? Colors.dark : Colors.light;
 
   const [activeTab, setActiveTab] = useState<"browse" | "saved">("browse");
-  const [mediaAssets, setMediaAssets] = useState<MediaAsset[]>([]);
-  const [savedStatuses, setSavedStatuses] = useState<StatusItem[]>([]);
-  const [permissionStatus, setPermissionStatus] = useState<"undetermined" | "granted" | "denied">("undetermined");
-  const [loading, setLoading] = useState(false);
-  const [refreshing, setRefreshing] = useState(false);
-  const [selected, setSelected] = useState<MediaAsset | StatusItem | null>(null);
-  const [selectedMode, setSelectedMode] = useState<"browse" | "saved">("browse");
+  const [browseItems, setBrowseItems] = useState<MediaItem[]>([]);
+  const [savedItems, setSavedItems] = useState<SavedItem[]>([]);
   const [savedIds, setSavedIds] = useState<Set<string>>(new Set());
+  const [loading, setLoading] = useState(false);
+  const [selected, setSelected] = useState<MediaItem | null>(null);
+  const [selectedMode, setSelectedMode] = useState<"browse" | "saved">("browse");
   const [saving, setSaving] = useState(false);
-  const [hasMore, setHasMore] = useState(false);
-  const [endCursor, setEndCursor] = useState<string | undefined>(undefined);
 
   const topPad = Platform.OS === "web" ? 67 : insets.top;
   const bottomPad = Platform.OS === "web" ? 34 : insets.bottom;
 
   useEffect(() => {
     loadSaved();
-    checkPermission();
+    loadBrowseCache();
   }, []);
-
-  async function checkPermission() {
-    if (Platform.OS === "web") return;
-    const { status } = await MediaLibrary.getPermissionsAsync(false);
-    setPermissionStatus(status as any);
-    if (status === "granted") {
-      loadMedia(true);
-    }
-  }
-
-  async function requestPermission() {
-    const { status } = await MediaLibrary.requestPermissionsAsync(false);
-    setPermissionStatus(status as any);
-    if (status === "granted") {
-      loadMedia(true);
-    }
-  }
-
-  async function loadMedia(reset = false) {
-    if (Platform.OS === "web") return;
-    if (loading && !reset) return;
-    setLoading(true);
-    try {
-      const result = await MediaLibrary.getAssetsAsync({
-        mediaType: [MediaLibrary.MediaType.photo, MediaLibrary.MediaType.video],
-        sortBy: [[MediaLibrary.SortBy.modificationTime, false]],
-        first: 60,
-        after: reset ? undefined : endCursor,
-      });
-
-      const assets = result.assets as unknown as MediaAsset[];
-      if (reset) {
-        setMediaAssets(assets);
-      } else {
-        setMediaAssets((prev) => [...prev, ...assets]);
-      }
-      setHasMore(result.hasNextPage);
-      setEndCursor(result.endCursor);
-    } catch (e) {
-      console.log("Media load error:", e);
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
-  }
 
   async function loadSaved() {
     try {
       const raw = await AsyncStorage.getItem(STORAGE_KEY);
       if (raw) {
-        const items: StatusItem[] = JSON.parse(raw);
-        setSavedStatuses(items);
+        const items: SavedItem[] = JSON.parse(raw);
+        setSavedItems(items);
         setSavedIds(new Set(items.map((s) => s.id)));
       }
     } catch {}
   }
 
-  async function saveStatus(asset: MediaAsset) {
-    if (savedIds.has(asset.id)) {
+  async function loadBrowseCache() {
+    try {
+      const raw = await AsyncStorage.getItem(BROWSE_CACHE_KEY);
+      if (raw) setBrowseItems(JSON.parse(raw));
+    } catch {}
+  }
+
+  async function openGallery() {
+    setLoading(true);
+    try {
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== "granted") {
+        Alert.alert(
+          "Permission Required",
+          "Please allow gallery access to browse and save statuses."
+        );
+        setLoading(false);
+        return;
+      }
+
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ["images", "videos"],
+        allowsMultipleSelection: true,
+        quality: 1,
+        selectionLimit: 100,
+        orderedSelection: false,
+      });
+
+      if (!result.canceled && result.assets.length > 0) {
+        const newItems: MediaItem[] = result.assets.map((asset) => ({
+          id: asset.assetId || (Date.now().toString() + Math.random().toString(36).substr(2, 9)),
+          uri: asset.uri,
+          type: asset.type === "video" ? "video" : "image",
+          duration: asset.duration ?? undefined,
+        }));
+        setBrowseItems(newItems);
+        await AsyncStorage.setItem(BROWSE_CACHE_KEY, JSON.stringify(newItems));
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      }
+    } catch (e) {
+      Alert.alert("Error", "Failed to open gallery.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function saveItem(item: MediaItem) {
+    if (savedIds.has(item.id)) {
       Alert.alert("Already Saved", "This status is already in your gallery.");
       return;
     }
     setSaving(true);
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    const newItem: StatusItem = {
-      id: asset.id,
-      uri: asset.uri,
-      type: asset.mediaType === "video" ? "video" : "image",
-      savedAt: new Date().toISOString(),
-      duration: asset.duration,
-    };
-    const updated = [newItem, ...savedStatuses];
-    setSavedStatuses(updated);
+    const newSaved: SavedItem = { ...item, savedAt: new Date().toISOString() };
+    const updated = [newSaved, ...savedItems];
+    setSavedItems(updated);
     setSavedIds(new Set(updated.map((s) => s.id)));
     await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
     setSaving(false);
   }
 
-  async function deleteStatus(id: string) {
+  async function deleteSaved(id: string) {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    const updated = savedStatuses.filter((s) => s.id !== id);
-    setSavedStatuses(updated);
+    const updated = savedItems.filter((s) => s.id !== id);
+    setSavedItems(updated);
     setSavedIds(new Set(updated.map((s) => s.id)));
     await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-    if ((selected as StatusItem)?.id === id) setSelected(null);
+    if (selected?.id === id) setSelected(null);
   }
 
   async function shareItem(uri: string) {
@@ -161,50 +145,32 @@ export default function StatusScreen() {
     } catch {}
   }
 
-  const onRefresh = useCallback(() => {
-    setRefreshing(true);
-    loadMedia(true);
-  }, []);
-
-  function openAsset(asset: MediaAsset) {
-    setSelected(asset);
-    setSelectedMode("browse");
-  }
-
-  function openSaved(item: StatusItem) {
-    setSelected(item);
-    setSelectedMode("saved");
-  }
-
-  function isSavedAsset(asset: MediaAsset) {
-    return savedIds.has(asset.id);
-  }
-
-  function formatDuration(secs: number) {
+  function formatDuration(secs?: number) {
+    if (!secs) return "";
     const m = Math.floor(secs / 60);
     const s = Math.floor(secs % 60);
     return `${m}:${s.toString().padStart(2, "0")}`;
   }
 
-  const renderBrowseItem = ({ item }: { item: MediaAsset }) => {
-    const saved = isSavedAsset(item);
+  const renderBrowseItem = ({ item }: { item: MediaItem }) => {
+    const saved = savedIds.has(item.id);
     return (
       <TouchableOpacity
         style={styles.gridItem}
-        onPress={() => openAsset(item)}
+        onPress={() => { setSelected(item); setSelectedMode("browse"); }}
         activeOpacity={0.85}
       >
         <Image source={{ uri: item.uri }} style={styles.gridImage} />
-        {item.mediaType === "video" && (
+        {item.type === "video" && (
           <View style={styles.videoBadge}>
             <Ionicons name="play" size={10} color="#fff" />
-            {item.duration > 0 && (
-              <Text style={styles.durationText}>{formatDuration(item.duration)}</Text>
+            {!!item.duration && (
+              <Text style={styles.durText}>{formatDuration(item.duration)}</Text>
             )}
           </View>
         )}
         {saved && (
-          <View style={styles.savedBadge}>
+          <View style={styles.checkBadge}>
             <Ionicons name="checkmark" size={11} color="#fff" />
           </View>
         )}
@@ -212,10 +178,10 @@ export default function StatusScreen() {
     );
   };
 
-  const renderSavedItem = ({ item }: { item: StatusItem }) => (
+  const renderSavedItem = ({ item }: { item: SavedItem }) => (
     <TouchableOpacity
       style={styles.gridItem}
-      onPress={() => openSaved(item)}
+      onPress={() => { setSelected(item); setSelectedMode("saved"); }}
       activeOpacity={0.85}
     >
       <Image source={{ uri: item.uri }} style={styles.gridImage} />
@@ -229,7 +195,7 @@ export default function StatusScreen() {
         onPress={() =>
           Alert.alert("Delete", "Remove from saved gallery?", [
             { text: "Cancel", style: "cancel" },
-            { text: "Delete", style: "destructive", onPress: () => deleteStatus(item.id) },
+            { text: "Delete", style: "destructive", onPress: () => deleteSaved(item.id) },
           ])
         }
         hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
@@ -239,20 +205,7 @@ export default function StatusScreen() {
     </TouchableOpacity>
   );
 
-  const selectedUri =
-    selected
-      ? selectedMode === "saved"
-        ? (selected as StatusItem).uri
-        : (selected as MediaAsset).uri
-      : null;
-
-  const selectedIsSaved =
-    selected && selectedMode === "browse"
-      ? isSavedAsset(selected as MediaAsset)
-      : true;
-
-  const permissionDenied = Platform.OS !== "web" && permissionStatus === "denied";
-  const permissionNeeded = Platform.OS !== "web" && permissionStatus === "undetermined";
+  const isSaved = selected ? savedIds.has(selected.id) : false;
 
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
@@ -260,14 +213,21 @@ export default function StatusScreen() {
       <View
         style={[
           styles.header,
-          {
-            paddingTop: topPad + 12,
-            backgroundColor: theme.card,
-            borderBottomColor: theme.border,
-          },
+          { paddingTop: topPad + 12, backgroundColor: theme.card, borderBottomColor: theme.border },
         ]}
       >
-        <Text style={[styles.headerTitle, { color: theme.text }]}>Status Saver</Text>
+        <View style={styles.headerRow}>
+          <Text style={[styles.headerTitle, { color: theme.text }]}>Status Saver</Text>
+          {activeTab === "browse" && browseItems.length > 0 && (
+            <TouchableOpacity
+              style={styles.refreshBtn}
+              onPress={openGallery}
+              disabled={loading}
+            >
+              <Ionicons name="refresh" size={18} color={Colors.primary} />
+            </TouchableOpacity>
+          )}
+        </View>
         <View style={[styles.tabBar, { backgroundColor: isDark ? Colors.dark.background : "#F3F4F6" }]}>
           {(["browse", "saved"] as const).map((tab) => (
             <TouchableOpacity
@@ -279,13 +239,8 @@ export default function StatusScreen() {
                 if (tab === "saved") loadSaved();
               }}
             >
-              <Text
-                style={[
-                  styles.tabLabel,
-                  { color: activeTab === tab ? "#fff" : theme.textSecondary },
-                ]}
-              >
-                {tab === "browse" ? "Browse" : `Saved (${savedStatuses.length})`}
+              <Text style={[styles.tabLabel, { color: activeTab === tab ? "#fff" : theme.textSecondary }]}>
+                {tab === "browse" ? "Browse" : `Saved (${savedItems.length})`}
               </Text>
             </TouchableOpacity>
           ))}
@@ -294,95 +249,53 @@ export default function StatusScreen() {
 
       {/* Browse Tab */}
       {activeTab === "browse" && (
-        <>
-          {Platform.OS === "web" ? (
-            <View style={styles.webMsg}>
-              <Ionicons name="phone-portrait-outline" size={48} color={theme.textSecondary} />
-              <Text style={[styles.webMsgText, { color: theme.text }]}>
-                Use the mobile app to browse and save statuses from your gallery
-              </Text>
+        browseItems.length === 0 ? (
+          <View style={styles.emptyBrowse}>
+            <View style={styles.permIcon}>
+              <Ionicons name="images" size={40} color="#fff" />
             </View>
-          ) : permissionDenied ? (
-            <View style={styles.permContainer}>
-              <Ionicons name="lock-closed-outline" size={56} color={theme.textSecondary} />
-              <Text style={[styles.permTitle, { color: theme.text }]}>Gallery Access Denied</Text>
-              <Text style={[styles.permText, { color: theme.textSecondary }]}>
-                Please enable photo access in your device settings to browse media.
+            <Text style={[styles.permTitle, { color: theme.text }]}>Browse Your Gallery</Text>
+            <Text style={[styles.permText, { color: theme.textSecondary }]}>
+              Open your gallery to browse photos and videos. Tap any item to preview and save it.
+            </Text>
+            <TouchableOpacity
+              style={[styles.loadBtn, { opacity: loading ? 0.7 : 1 }]}
+              onPress={openGallery}
+              disabled={loading}
+              activeOpacity={0.85}
+            >
+              {loading ? (
+                <ActivityIndicator color="#fff" size="small" />
+              ) : (
+                <>
+                  <Ionicons name="folder-open" size={20} color="#fff" />
+                  <Text style={styles.loadBtnText}>Open Gallery</Text>
+                </>
+              )}
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <FlatList
+            data={browseItems}
+            keyExtractor={(item) => item.id}
+            renderItem={renderBrowseItem}
+            numColumns={3}
+            contentContainerStyle={[styles.grid, { paddingBottom: bottomPad + 90 }]}
+            columnWrapperStyle={styles.gridRow}
+            showsVerticalScrollIndicator={false}
+            ListHeaderComponent={
+              <Text style={[styles.countLabel, { color: theme.textSecondary }]}>
+                {browseItems.length} items loaded — tap to preview & save
               </Text>
-            </View>
-          ) : permissionNeeded ? (
-            <View style={styles.permContainer}>
-              <View style={styles.permIcon}>
-                <Ionicons name="images" size={40} color="#fff" />
-              </View>
-              <Text style={[styles.permTitle, { color: theme.text }]}>Browse Your Gallery</Text>
-              <Text style={[styles.permText, { color: theme.textSecondary }]}>
-                WhatsToolbox needs access to your gallery to show and save statuses — just like a status saver app.
-              </Text>
-              <TouchableOpacity style={styles.permBtn} onPress={requestPermission}>
-                <Text style={styles.permBtnText}>Allow Access</Text>
-              </TouchableOpacity>
-            </View>
-          ) : (
-            <FlatList
-              data={mediaAssets}
-              keyExtractor={(item) => item.id}
-              renderItem={renderBrowseItem}
-              numColumns={3}
-              contentContainerStyle={[styles.grid, { paddingBottom: bottomPad + 90 }]}
-              columnWrapperStyle={styles.gridRow}
-              showsVerticalScrollIndicator={false}
-              refreshControl={
-                <RefreshControl
-                  refreshing={refreshing}
-                  onRefresh={onRefresh}
-                  tintColor={Colors.primary}
-                  colors={[Colors.primary]}
-                />
-              }
-              onEndReached={() => {
-                if (hasMore && !loading) loadMedia(false);
-              }}
-              onEndReachedThreshold={0.3}
-              ListHeaderComponent={
-                mediaAssets.length > 0 ? (
-                  <Text style={[styles.countLabel, { color: theme.textSecondary }]}>
-                    {mediaAssets.length} items — tap to preview & save
-                  </Text>
-                ) : null
-              }
-              ListFooterComponent={
-                loading && !refreshing ? (
-                  <ActivityIndicator color={Colors.primary} style={{ marginVertical: 20 }} />
-                ) : null
-              }
-              ListEmptyComponent={
-                loading ? (
-                  <View style={styles.loadingState}>
-                    <ActivityIndicator size="large" color={Colors.primary} />
-                    <Text style={[styles.loadingText, { color: theme.textSecondary }]}>
-                      Loading gallery...
-                    </Text>
-                  </View>
-                ) : (
-                  <View style={styles.emptyState}>
-                    <Ionicons name="images-outline" size={56} color={theme.textSecondary} />
-                    <Text style={[styles.emptyTitle, { color: theme.text }]}>No media found</Text>
-                    <Text style={[styles.emptyText, { color: theme.textSecondary }]}>
-                      Pull down to refresh
-                    </Text>
-                  </View>
-                )
-              }
-            />
-          )}
-        </>
+            }
+          />
+        )
       )}
 
       {/* Saved Tab */}
       {activeTab === "saved" && (
         <FlatList
-          data={savedStatuses}
+          data={savedItems}
           keyExtractor={(item) => item.id}
           renderItem={renderSavedItem}
           numColumns={3}
@@ -390,9 +303,9 @@ export default function StatusScreen() {
           columnWrapperStyle={styles.gridRow}
           showsVerticalScrollIndicator={false}
           ListHeaderComponent={
-            savedStatuses.length > 0 ? (
+            savedItems.length > 0 ? (
               <Text style={[styles.countLabel, { color: theme.textSecondary }]}>
-                {savedStatuses.length} item{savedStatuses.length !== 1 ? "s" : ""} saved
+                {savedItems.length} item{savedItems.length !== 1 ? "s" : ""} saved
               </Text>
             ) : null
           }
@@ -401,14 +314,14 @@ export default function StatusScreen() {
               <Ionicons name="bookmark-outline" size={56} color={theme.textSecondary} />
               <Text style={[styles.emptyTitle, { color: theme.text }]}>Nothing saved yet</Text>
               <Text style={[styles.emptyText, { color: theme.textSecondary }]}>
-                Browse your gallery and tap to save statuses
+                Browse gallery and tap any item to save
               </Text>
             </View>
           }
         />
       )}
 
-      {/* Fullscreen Preview Modal */}
+      {/* Fullscreen Preview */}
       <Modal
         visible={!!selected}
         transparent
@@ -423,21 +336,17 @@ export default function StatusScreen() {
             <Ionicons name="close" size={26} color="#fff" />
           </TouchableOpacity>
 
-          {selectedUri && (
-            <Image
-              source={{ uri: selectedUri }}
-              style={styles.fullImg}
-              resizeMode="contain"
-            />
+          {selected && (
+            <Image source={{ uri: selected.uri }} style={styles.fullImg} resizeMode="contain" />
           )}
 
           <View style={[styles.modalActions, { paddingBottom: insets.bottom + 16 }]}>
-            {selectedMode === "browse" && !selectedIsSaved && (
+            {selectedMode === "browse" && !isSaved && (
               <TouchableOpacity
                 style={styles.actionBtn}
                 onPress={async () => {
                   if (selected) {
-                    await saveStatus(selected as MediaAsset);
+                    await saveItem(selected);
                     setSelected(null);
                     setActiveTab("saved");
                   }
@@ -449,22 +358,20 @@ export default function StatusScreen() {
                 ) : (
                   <Ionicons name="bookmark" size={22} color="#fff" />
                 )}
-                <Text style={styles.actionText}>
-                  {saving ? "Saving..." : "Save"}
-                </Text>
+                <Text style={styles.actionText}>{saving ? "Saving..." : "Save"}</Text>
               </TouchableOpacity>
             )}
 
-            {selectedMode === "browse" && selectedIsSaved && (
+            {selectedMode === "browse" && isSaved && (
               <View style={[styles.actionBtn, { backgroundColor: "rgba(255,255,255,0.15)" }]}>
-                <Ionicons name="checkmark-circle" size={22} color="#25D366" />
+                <Ionicons name="checkmark-circle" size={22} color={Colors.primary} />
                 <Text style={styles.actionText}>Saved</Text>
               </View>
             )}
 
             <TouchableOpacity
               style={[styles.actionBtn, { backgroundColor: "rgba(255,255,255,0.15)" }]}
-              onPress={() => selectedUri && shareItem(selectedUri)}
+              onPress={() => selected && shareItem(selected.uri)}
             >
               <Ionicons name="share-social" size={22} color="#fff" />
               <Text style={styles.actionText}>Share</Text>
@@ -479,7 +386,7 @@ export default function StatusScreen() {
                     {
                       text: "Delete",
                       style: "destructive",
-                      onPress: () => deleteStatus((selected as StatusItem).id),
+                      onPress: () => deleteSaved(selected!.id),
                     },
                   ]);
                 }}
@@ -503,9 +410,18 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     gap: 12,
   },
+  headerRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
   headerTitle: {
     fontSize: 22,
     fontFamily: "Inter_700Bold",
+  },
+  refreshBtn: {
+    padding: 6,
+    borderRadius: 8,
   },
   tabBar: {
     flexDirection: "row",
@@ -522,8 +438,50 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontFamily: "Inter_600SemiBold",
   },
+  emptyBrowse: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 40,
+    gap: 16,
+  },
+  permIcon: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: Colors.primary,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 4,
+  },
+  permTitle: {
+    fontSize: 20,
+    fontFamily: "Inter_700Bold",
+    textAlign: "center",
+  },
+  permText: {
+    fontSize: 14,
+    fontFamily: "Inter_400Regular",
+    textAlign: "center",
+    lineHeight: 22,
+  },
+  loadBtn: {
+    backgroundColor: Colors.primary,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 36,
+    paddingVertical: 14,
+    borderRadius: 14,
+    gap: 10,
+    marginTop: 8,
+  },
+  loadBtnText: {
+    color: "#fff",
+    fontSize: 16,
+    fontFamily: "Inter_600SemiBold",
+  },
   grid: {
-    paddingHorizontal: 0,
     paddingTop: 4,
   },
   gridRow: {
@@ -551,12 +509,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 3,
   },
-  durationText: {
+  durText: {
     color: "#fff",
     fontSize: 10,
     fontFamily: "Inter_500Medium",
   },
-  savedBadge: {
+  checkBadge: {
     position: "absolute",
     top: 6,
     right: 6,
@@ -576,18 +534,8 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontFamily: "Inter_400Regular",
     paddingHorizontal: 12,
-    paddingBottom: 8,
-    paddingTop: 4,
-  },
-  loadingState: {
-    alignItems: "center",
-    justifyContent: "center",
-    paddingTop: 80,
-    gap: 14,
-  },
-  loadingText: {
-    fontSize: 14,
-    fontFamily: "Inter_400Regular",
+    paddingBottom: 6,
+    paddingTop: 6,
   },
   emptyState: {
     alignItems: "center",
@@ -604,58 +552,6 @@ const styles = StyleSheet.create({
     fontFamily: "Inter_400Regular",
     textAlign: "center",
     paddingHorizontal: 40,
-  },
-  webMsg: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 40,
-    gap: 16,
-  },
-  webMsgText: {
-    fontSize: 16,
-    fontFamily: "Inter_500Medium",
-    textAlign: "center",
-    lineHeight: 24,
-  },
-  permContainer: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 40,
-    gap: 16,
-  },
-  permIcon: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: Colors.primary,
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 8,
-  },
-  permTitle: {
-    fontSize: 20,
-    fontFamily: "Inter_700Bold",
-    textAlign: "center",
-  },
-  permText: {
-    fontSize: 14,
-    fontFamily: "Inter_400Regular",
-    textAlign: "center",
-    lineHeight: 22,
-  },
-  permBtn: {
-    backgroundColor: Colors.primary,
-    paddingHorizontal: 36,
-    paddingVertical: 14,
-    borderRadius: 14,
-    marginTop: 8,
-  },
-  permBtnText: {
-    color: "#fff",
-    fontSize: 16,
-    fontFamily: "Inter_600SemiBold",
   },
   modal: {
     flex: 1,
