@@ -1,0 +1,392 @@
+1. Product Overview
+
+WhatsToolbox is a mobile utility application built with React Native that provides powerful tools to enhance the WhatsApp user experience.
+
+Instead of installing multiple apps for different WhatsApp utilities, users will get everything in one single toolbox app, including:
+
+Status saving
+
+Direct chat
+
+Media management
+
+Messaging utilities
+
+Automation tools
+
+AI caption generator
+
+The application will be lightweight, easy to use, and optimized for Android devices.
+
+2. Product Goals
+Primary Goals
+
+Provide multiple WhatsApp utilities in one app.
+
+Allow users to easily save and manage WhatsApp statuses.
+
+Offer automation tools to improve messaging productivity.
+
+Business Goals
+
+Reach 100K+ downloads within 12 months
+
+Generate revenue through AdMob ads
+
+Maintain fast performance and simple UI
+
+3. Target Audience
+Primary Users
+
+WhatsApp daily users
+
+Social media users
+
+Content creators
+
+Secondary Users
+
+Small business owners
+
+Digital marketers
+
+Community managers
+
+4. Platform
+
+Initial Platform
+
+Android
+
+Future Platform
+
+iOS
+
+5. Technology Stack
+
+Frontend
+
+React Native
+
+TypeScript
+
+Navigation
+
+React Navigation
+
+UI Framework
+
+React Native Paper
+
+File Access
+
+react-native-fs
+
+Media Access
+
+react-native-media-library
+
+Permissions
+
+react-native-permissions
+
+WebView
+
+react-native-webview
+
+Ads
+
+react-native-google-mobile-ads
+
+State Management
+
+Redux Toolkit or Zustand
+
+6. App Modules
+
+To keep the project organized, the app features are divided into multiple modules (parts).
+
+Part 1 — Status Management Module
+
+This module handles all WhatsApp status related features.
+
+6.1 Status Saver
+
+Allows users to download WhatsApp image and video statuses.
+
+Features
+
+Detect WhatsApp status folder
+
+Show image and video statuses
+
+Download status
+
+Share status
+
+Repost status
+
+Delete saved status
+
+Status Folder Path
+
+Android
+
+/Android/media/com.whatsapp/WhatsApp/Media/.Statuses
+6.2 Saved Status Gallery
+
+A gallery that stores all downloaded statuses.
+
+Features
+
+View saved images
+
+View saved videos
+
+Share status
+
+Delete status
+
+Repost status
+
+6.3 Auto Status Download
+
+Automatically saves all new WhatsApp statuses.
+
+Features
+
+Auto detect new statuses
+
+Background auto download
+
+Notification when status saved
+
+Option to enable/disable auto download
+
+6.4 Status Scheduler
+
+Allows users to schedule status posts for WhatsApp.
+
+Features
+
+Select image/video
+
+Add caption
+
+Choose schedule time
+
+Reminder notification when time arrives
+
+Note:
+Due to WhatsApp limitations, the app will notify users to post the status manually.
+
+Part 2 — Messaging Tools Module
+
+Tools designed to make WhatsApp messaging easier and faster.
+
+6.5 Direct Chat (Click to Chat)
+
+Users can send WhatsApp messages without saving phone numbers.
+
+Features
+
+Enter phone number
+
+Add optional message
+
+Open chat directly in WhatsApp
+
+Example URL
+
+https://wa.me/923001234567
+6.6 Text Repeater
+
+Repeats text messages multiple times.
+
+Features
+
+Enter text
+
+Select repetition count
+
+Copy result
+
+Send directly to WhatsApp
+
+6.7 Bulk Message Sender
+
+Allows users to send the same message to multiple contacts.
+
+Features
+
+Select multiple contacts
+
+Write message
+
+Send message sequentially
+
+Note
+To comply with WhatsApp policies, the app will open chats individually instead of sending messages automatically.
+
+Part 3 — Creative Tools Module
+
+Tools designed for creating better WhatsApp content.
+
+6.8 Fancy Text Generator
+
+Converts normal text into stylish fonts.
+
+Example
+
+Input
+Hello
+
+Output examples
+
+𝓗𝓮𝓵𝓵𝓸
+𝙃𝙚𝙡𝙡𝙤
+🅷🅴🅻🅻🅾
+
+6.9 WhatsApp Sticker Maker
+
+Allows users to create custom WhatsApp stickers.
+
+Features
+
+Import image
+
+Crop image
+
+Remove background
+
+Add text
+
+Export sticker pack to WhatsApp
+
+6.10 AI Caption Generator
+
+Uses AI to generate captions for statuses and posts.
+
+Features
+
+Generate captions for photos
+
+Generate captions for videos
+
+Multiple caption styles
+
+Examples
+
+Funny captions
+
+Motivational captions
+
+Romantic captions
+
+Business captions
+
+Part 4 — WhatsApp Web Tools
+6.11 WhatsApp Web
+
+Allows users to access WhatsApp Web inside the app.
+
+Features
+
+Scan QR code
+
+Open WhatsApp Web session
+
+Logout option
+
+7. App Screens
+Splash Screen
+
+Logo and loading animation
+
+Home Dashboard
+
+Main tools grid
+
+Status Saver Screen
+
+Tabs
+
+Images
+
+Videos
+
+Saved Status Screen
+
+Media gallery
+
+Tools Screen
+
+Messaging tools list
+
+Creative Tools Screen
+
+Text and sticker tools
+
+Settings Screen
+
+Options include
+
+Dark Mode
+
+Share App
+
+Rate App
+
+Privacy Policy
+
+8. UI Design
+Primary Color
+#25D366
+Secondary Color
+#128C7E
+Background Colors
+
+Light Mode
+
+#FFFFFF
+
+Dark Mode
+
+#121212
+9. Permissions Required
+
+Android permissions required.
+
+Storage Access
+
+READ_EXTERNAL_STORAGE
+
+Android 13+
+
+READ_MEDIA_IMAGES
+READ_MEDIA_VIDEO
+
+Internet Permission
+
+For ads and sharing.
+
+10. Monetization
+Banner Ads
+
+Home screen
+
+Interstitial Ads
+
+After saving status
+
+Reward Ads
+
+Unlock premium tools
+
+11. Security & Privacy
+
+App does not access private chats
+
+Only reads media files stored locally
+
+No personal data stored on servers
