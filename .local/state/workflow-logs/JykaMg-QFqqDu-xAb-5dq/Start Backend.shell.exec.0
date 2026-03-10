@@ -1,0 +1,77 @@
+
+> expo-app@1.0.0 server:dev
+> NODE_ENV=development tsx server/index.ts
+
+[1G[0KServing static Expo files with dynamic manifest routing
+Expo routing: Checking expo-platform header on / and /manifest
+express server serving on port 5000
+Error generating captions: RateLimitError: 429 You exceeded your current quota, please check your plan and billing details. For more information on this error, read the docs: https://platform.openai.com/docs/guides/error-codes/api-errors.
+    at Function.generate [90m(/home/runner/workspace/[39mnode_modules/[4mopenai[24m/src/core/error.ts:96:14[90m)[39m
+    at OpenAI.makeStatusError [90m(/home/runner/workspace/[39mnode_modules/[4mopenai[24m/src/client.ts:488:28[90m)[39m
+    at OpenAI.makeRequest [90m(/home/runner/workspace/[39mnode_modules/[4mopenai[24m/src/client.ts:738:24[90m)[39m
+[90m    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at async <anonymous> [90m(/home/runner/workspace/[39mserver/routes.ts:53:24[90m)[39m {
+  status: [33m429[39m,
+  headers: Headers {
+    date: [32m'Tue, 10 Mar 2026 09:00:24 GMT'[39m,
+    [32m'content-type'[39m: [32m'application/json; charset=utf-8'[39m,
+    [32m'content-length'[39m: [32m'337'[39m,
+    connection: [32m'keep-alive'[39m,
+    vary: [32m'Origin'[39m,
+    [32m'x-request-id'[39m: [32m'req_c493570ec56243dbb57656a14d32f812'[39m,
+    [32m'x-openai-proxy-wasm'[39m: [32m'v0.1'[39m,
+    server: [32m'cloudflare'[39m,
+    [32m'cf-cache-status'[39m: [32m'DYNAMIC'[39m,
+    [32m'set-cookie'[39m: [32m'__cf_bm=CXPkHl.z65X5EnkV4XbYuXCyMognkqFwEYdL3eHGEaY-1773133224.3280244-1.0.1.1-mgoAhB2hW2qLkVS_7sd7n9g51EnFv8lls7uwNpcjT2ToH8hDQM.Bi9rze3rDK6hJOqf5pVJoBJ6bZhZwbDPJ3HqrxqoIgxJ35VHna1s9U6lJJ3XUnXRu.KuW_Iz3bN7N; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Tue, 10 Mar 2026 09:30:24 GMT, _cfuvid=SteDt17LMWwaJvEFPE1eQg3zOqDFplMHojG8bFr2lP8-1773133224.3280244-1.0.1.1-GYotgTpsYpuJKPurEWvu5vkYX1xUkTaRL2t17ZMnPC0; HttpOnly; SameSite=None; Secure; Path=/; Domain=api.openai.com'[39m,
+    [32m'strict-transport-security'[39m: [32m'max-age=31536000; includeSubDomains; preload'[39m,
+    [32m'x-content-type-options'[39m: [32m'nosniff'[39m,
+    [32m'cf-ray'[39m: [32m'9da120fc0e5ca33b-SEA'[39m,
+    [32m'alt-svc'[39m: [32m'h3=":443"; ma=86400'[39m
+  },
+  requestID: [32m'req_c493570ec56243dbb57656a14d32f812'[39m,
+  error: {
+    message: [32m'You exceeded your current quota, please check your plan and billing details. For more information on this error, read the docs: https://platform.openai.com/docs/guides/error-codes/api-errors.'[39m,
+    type: [32m'insufficient_quota'[39m,
+    param: [1mnull[22m,
+    code: [32m'insufficient_quota'[39m
+  },
+  code: [32m'insufficient_quota'[39m,
+  param: [1mnull[22m,
+  type: [32m'insufficient_quota'[39m
+}
+POST /api/generate-caption 500 in 3002ms :: {"error":"Failed to generate captio…
+Error generating captions: RateLimitError: 429 You exceeded your current quota, please check your plan and billing details. For more information on this error, read the docs: https://platform.openai.com/docs/guides/error-codes/api-errors.
+    at Function.generate [90m(/home/runner/workspace/[39mnode_modules/[4mopenai[24m/src/core/error.ts:96:14[90m)[39m
+    at OpenAI.makeStatusError [90m(/home/runner/workspace/[39mnode_modules/[4mopenai[24m/src/client.ts:488:28[90m)[39m
+    at OpenAI.makeRequest [90m(/home/runner/workspace/[39mnode_modules/[4mopenai[24m/src/client.ts:738:24[90m)[39m
+[90m    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at async <anonymous> [90m(/home/runner/workspace/[39mserver/routes.ts:53:24[90m)[39m {
+  status: [33m429[39m,
+  headers: Headers {
+    date: [32m'Tue, 10 Mar 2026 09:00:54 GMT'[39m,
+    [32m'content-type'[39m: [32m'application/json; charset=utf-8'[39m,
+    [32m'content-length'[39m: [32m'337'[39m,
+    connection: [32m'keep-alive'[39m,
+    vary: [32m'Origin'[39m,
+    [32m'x-request-id'[39m: [32m'req_0a09c02b852143d78484569d80233025'[39m,
+    [32m'x-openai-proxy-wasm'[39m: [32m'v0.1'[39m,
+    server: [32m'cloudflare'[39m,
+    [32m'cf-cache-status'[39m: [32m'DYNAMIC'[39m,
+    [32m'set-cookie'[39m: [32m'__cf_bm=fPM21z5QKejryDgEwzXWEBxwzV1tl1WnlRKqFZwJ_xk-1773133254.9119751-1.0.1.1-7WVejmNBu1xvJ5PlxD5GRjjUqzRUNxjWBEuFcNNv64jvQ6C_38Ci4uX6KzA9xZVwlP.kYmeMTDKqSt._bYb5s1hDAUkN5.dLsAbI5fCZ_KD7G7SIKCyMgg1wfIKBhfqM; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Tue, 10 Mar 2026 09:30:54 GMT, _cfuvid=Anv6cwCKAtzyzrwxCVSnYccqJAr8Q5hK.0d8kUoMOTM-1773133254.9119751-1.0.1.1-jlUQwNm1Ch4EC6fthJqjbhMJwEB93X52cNKLCeRYX1g; HttpOnly; SameSite=None; Secure; Path=/; Domain=api.openai.com'[39m,
+    [32m'strict-transport-security'[39m: [32m'max-age=31536000; includeSubDomains; preload'[39m,
+    [32m'x-content-type-options'[39m: [32m'nosniff'[39m,
+    [32m'cf-ray'[39m: [32m'9da121bb3b6fa33b-SEA'[39m,
+    [32m'alt-svc'[39m: [32m'h3=":443"; ma=86400'[39m
+  },
+  requestID: [32m'req_0a09c02b852143d78484569d80233025'[39m,
+  error: {
+    message: [32m'You exceeded your current quota, please check your plan and billing details. For more information on this error, read the docs: https://platform.openai.com/docs/guides/error-codes/api-errors.'[39m,
+    type: [32m'insufficient_quota'[39m,
+    param: [1mnull[22m,
+    code: [32m'insufficient_quota'[39m
+  },
+  code: [32m'insufficient_quota'[39m,
+  param: [1mnull[22m,
+  type: [32m'insufficient_quota'[39m
+}
+POST /api/generate-caption 500 in 1931ms :: {"error":"Failed to generate captio…

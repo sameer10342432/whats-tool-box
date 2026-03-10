@@ -1,0 +1,280 @@
+
+> expo-app@1.0.0 expo:dev
+> EXPO_PACKAGER_PROXY_URL=https://$REPLIT_DEV_DOMAIN REACT_NATIVE_PACKAGER_HOSTNAME=$REPLIT_DEV_DOMAIN EXPO_PUBLIC_DOMAIN=$REPLIT_DEV_DOMAIN:5000 npx expo start --localhost
+
+[1G[0K[1G[0K⠙[1G[0K[90mStarting project at /home/runner/workspace[39m
+[90mReact Compiler enabled[39m
+[2mStarting Metro Bundler[22m
+[33mThe following packages should be updated for best compatibility with the installed [1mexpo[22m version:[39m
+[33m  [1mexpo[22m[36m@[39m[33m[31m54.0.32[39m[33m - expected version: [32m~54.0.33[39m[33m[39m
+[33m  [1mexpo-glass-effect[22m[36m@[39m[33m[31m0.1.8[39m[33m - expected version: [32m~0.1.9[39m[33m[39m
+[33m  [1mexpo-router[22m[36m@[39m[33m[31m6.0.22[39m[33m - expected version: [32m~6.0.23[39m[33m[39m
+[33m  [1mreact-native-keyboard-controller[22m[36m@[39m[33m[31m1.20.6[39m[33m - expected version: [32m1.18.5[39m[33m[39m
+[33mYour project may not work correctly until you install the expected versions of the packages.[39m
+▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
+█ ▄▄▄▄▄ █▀█▀█ ▀▄▀▄█▀▄▀▄ ▄▄█ ▄▄▄▄▄ █
+█ █   █ █▀▀▀▄█▀ █▄▀ ▀▄▄▀▀▄█ █   █ █
+█ █▄▄▄█ █▀ █▄██▄▀██▀▄█▄█▄ █ █▄▄▄█ █
+█▄▄▄▄▄▄▄█▄▀ █▄█▄█▄█ █▄▀▄█ █▄▄▄▄▄▄▄█
+█   ▄▄█▄ ▄▄▀▀▄ ▄█▀   ▄██ ▀ ▀ █ █▄▀█
+█▄▀▄ ▀ ▄▄▄█▄█▄▄  ███▀▀  ██▀▄█▀▄▀█▀█
+██ ▄█▄█▄▄▄▄▄▀▄▄▄█ ▄█▀▀▀▀  ▀▀ ▄▀█▀ █
+█ ██▄█▄▄▄▀ ▄▀▄▄▀ ██▄██▀▀▀▄ █▄█▄▀███
+██▀ █▄█▄██▄█   ▄▄▄▄▀▀▄▀▀▀▀▄▀▄▄▄█▀▀█
+█▀█ ▀  ▄▀▄▄██▄▄▀ █▄ ▀▄▀██ ▄█▄▄  ▄██
+█▀▄▄ ██▄█ ▀█▀█ ██▀▄▀▀▀▀▄▀▀▄▀▀▄▀▀▀ █
+█ █ ▄█ ▄▀ ▄▀█▀▄▄▄███▀▄ ▄██▄▀▀██  ██
+█▄█▄███▄▄▀▄▀ ▄▄ █▀▄█▀▀▀▀▀ ▄▄▄ ▄█▄▀█
+█ ▄▄▄▄▄ █▄▄██▄▄█ ███▀▀ █▄ █▄█ █  ▀█
+█ █   █ █ ▄▀ ▄▄▄▄  ▄▀▀▀▀█ ▄▄▄  ▀█▄█
+█ █▄▄▄█ █ █▄█ █ ▄██▄██ █ ▄▀ ▄█ ▀▄██
+█▄▄▄▄▄▄▄█▄▄███▄▄▄▄▄▄▄▄███▄▄█▄███▄██
+
+› Metro waiting on [4mexp://9d87a16d-95df-4506-896b-32d008fcc0f8-00-qbeu92pjh0xj.spock.replit.dev[24m
+› Scan the QR code above with Expo Go (Android) or the Camera app (iOS)
+
+› Web is waiting on [4mhttp://localhost:8081[24m
+
+› Using [36mExpo Go[39m
+› Press [1ms[22m [2m│[22m switch to development build
+
+› Press [1ma[22m [2m│[22m open Android
+› Press [1mw[22m [2m│[22m open web
+
+› Press [1mj[22m [2m│[22m open debugger
+› Press [1mr[22m [2m│[22m reload app
+› Press [1mm[22m [2m│[22m toggle menu
+› [1mshift+m[22m [2m│[22m more tools
+› Press [1mo[22m [2m│[22m open project code in your editor
+
+› Press [1m?[22m [2m│[22m show all commands
+
+Logs for your project will appear below.[2m Press Ctrl+C to exit.[22m
+[1mWeb[22m [0m[2mnode_modules/expo-router/[22m[0m[1mentry.js[22m [47m[37m░░░░░░░░░░░░░░░░[39m[49m[1m  0.0% [22m[2m(0/1)[22m
+[108D[1A[0J[1mWeb[22m [0m[2mnode_modules/expo-router/[22m[0m[1mentry.js[22m [32m[42m▓[49m[39m[47m[37m░░░░░░░░░░░░░░░[39m[49m[1m  8.3% [22m[2m( 67/232)[22m
+[108D[1A[0J[1mWeb[22m [0m[2mnode_modules/expo-router/[22m[0m[1mentry.js[22m [32m[42m▓▓▓[49m[39m[47m[37m░░░░░░░░░░░░░[39m[49m[1m 23.0% [22m[2m(173/361)[22m
+[108D[1A[0J[1mWeb[22m [0m[2mnode_modules/expo-router/[22m[0m[1mentry.js[22m [32m[42m▓▓▓▓▓[49m[39m[47m[37m░░░░░░░░░░░[39m[49m[1m 33.8% [22m[2m(357/614)[22m
+[108D[1A[0J[1mWeb[22m [0m[2mnode_modules/expo-router/[22m[0m[1mentry.js[22m [32m[42m▓▓▓▓▓▓▓▓[49m[39m[47m[37m░░░░░░░░[39m[49m[1m 55.8% [22m[2m(614/822)[22m
+[108D[1A[0J[1mWeb[22m [0m[2mnode_modules/expo-router/[22m[0m[1mentry.js[22m [32m[42m▓▓▓▓▓▓▓▓▓▓▓[49m[39m[47m[37m░░░░░[39m[49m[1m 73.8% [22m[2m(782/910)[22m
+[108D[1A[0J[1mWeb[22m [0m[2mnode_modules/expo-router/[22m[0m[1mentry.js[22m [32m[42m▓▓▓▓▓▓▓▓▓▓▓▓[49m[39m[47m[37m░░░░[39m[49m[1m 75.5% [22m[2m( 969/1115)[22m
+[108D[1A[0J[1mWeb[22m [0m[2mnode_modules/expo-router/[22m[0m[1mentry.js[22m [32m[42m▓▓▓▓▓▓▓▓▓▓▓▓▓[49m[39m[47m[37m░░░[39m[49m[1m 83.8% [22m[2m(1159/1266)[22m
+[108D[1A[0J[1mWeb[22m [0m[2mnode_modules/expo-router/[22m[0m[1mentry.js[22m [32m[42m▓▓▓▓▓▓▓▓▓▓▓▓▓▓[49m[39m[47m[37m░░[39m[49m[1m 93.6% [22m[2m(1307/1351)[22m
+[108D[1A[0J[32m[1mWeb[22m Bundled [39m[2m958ms[22m[0m[2m node_modules/expo-router/entry.js (1351 modules)[22m[0m
+[1mWeb[22m [0m[2mnode_modules/expo-router/[22m[0m[1mentry.js[22m [32m[42m▓▓▓▓▓▓▓▓▓▓▓▓▓▓[49m[39m[47m[37m░░[39m[49m[1m 93.6% [22m[2m(1307/1351)[22m
+[108D[1A[0J[7m[37m[1m LOG [22m[39m[27m [web] Logs will appear in the browser console
+[1mAndroid[22m [0m[2mnode_modules/expo-router/[22m[0m[1mentry.js[22m [47m[37m░░░░░░░░░░░░░░░░[39m[49m[1m  0.0% [22m[2m(0/1)[22m
+[108D[1A[0J[1mAndroid[22m [0m[2mnode_modules/expo-router/[22m[0m[1mentry.js[22m [47m[37m░░░░░░░░░░░░░░░░[39m[49m[1m  6.0% [22m[2m( 72/295)[22m
+[108D[1A[0J[1mAndroid[22m [0m[2mnode_modules/expo-router/[22m[0m[1mentry.js[22m [32m[42m▓▓[49m[39m[47m[37m░░░░░░░░░░░░░░[39m[49m[1m 14.7% [22m[2m(157/409)[22m
+[108D[1A[0J[1mAndroid[22m [0m[2mnode_modules/expo-router/[22m[0m[1mentry.js[22m [32m[42m▓▓[49m[39m[47m[37m░░░░░░░░░░░░░░[39m[49m[1m 17.6% [22m[2m(199/475)[22m
+[108D[1A[0J[1mAndroid[22m [0m[2mnode_modules/expo-router/[22m[0m[1mentry.js[22m [32m[42m▓▓▓▓▓[49m[39m[47m[37m░░░░░░░░░░░[39m[49m[1m 35.0% [22m[2m(365/617)[22m
+[108D[1A[0J[1mAndroid[22m [0m[2mnode_modules/expo-router/[22m[0m[1mentry.js[22m [32m[42m▓▓▓▓▓[49m[39m[47m[37m░░░░░░░░░░░[39m[49m[1m 35.0% [22m[2m(471/850)[22m
+[108D[1A[0J[1mAndroid[22m [0m[2mnode_modules/expo-router/[22m[0m[1mentry.js[22m [32m[42m▓▓▓▓▓▓▓[49m[39m[47m[37m░░░░░░░░░[39m[49m[1m 46.4% [22m[2m(642/942)[22m
+[108D[1A[0J[1mAndroid[22m [0m[2mnode_modules/expo-router/[22m[0m[1mentry.js[22m [32m[42m▓▓▓▓▓▓▓▓▓[49m[39m[47m[37m░░░░░░░[39m[49m[1m 57.5% [22m[2m( 848/1118)[22m
+[108D[1A[0J[1mAndroid[22m [0m[2mnode_modules/expo-router/[22m[0m[1mentry.js[22m [32m[42m▓▓▓▓▓▓▓▓▓▓▓[49m[39m[47m[37m░░░░░[39m[49m[1m 73.6% [22m[2m(1022/1191)[22m
+[108D[1A[0J[1mAndroid[22m [0m[2mnode_modules/expo-router/[22m[0m[1mentry.js[22m [32m[42m▓▓▓▓▓▓▓▓▓▓▓▓[49m[39m[47m[37m░░░░[39m[49m[1m 79.2% [22m[2m(1126/1265)[22m
+[108D[1A[0J[1mAndroid[22m [0m[2mnode_modules/expo-router/[22m[0m[1mentry.js[22m [32m[42m▓▓▓▓▓▓▓▓▓▓▓▓▓[49m[39m[47m[37m░░░[39m[49m[1m 81.5% [22m[2m(1173/1299)[22m
+[108D[1A[0J[1mAndroid[22m [0m[2mnode_modules/expo-router/[22m[0m[1mentry.js[22m [32m[42m▓▓▓▓▓▓▓▓▓▓▓▓▓[49m[39m[47m[37m░░░[39m[49m[1m 83.4% [22m[2m(1337/1464)[22m
+[108D[1A[0J[1mAndroid[22m [0m[2mnode_modules/expo-router/[22m[0m[1mentry.js[22m [32m[42m▓▓▓▓▓▓▓▓▓▓▓▓▓▓[49m[39m[47m[37m░░[39m[49m[1m 90.7% [22m[2m(1521/1597)[22m
+[108D[1A[0J[1mAndroid[22m [0m[2mnode_modules/expo-router/[22m[0m[1mentry.js[22m [32m[42m▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓[49m[39m[47m[37m░[39m[49m[1m 99.9% [22m[2m(1732/1732)[22m
+[108D[1A[0J[32m[1mAndroid[22m Bundled [39m[2m1436ms[22m[0m[2m node_modules/expo-router/entry.js (1732 modules)[22m[0m
+[1mAndroid[22m [0m[2mnode_modules/expo-router/[22m[0m[1mentry.js[22m [32m[42m▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓[49m[39m[47m[37m░[39m[49m[1m 99.9% [22m[2m(1732/1732)[22m
+[108D[1A[0J[7m[33m[1m WARN [22m[39m[27m Due to changes in Androids permission requirements, Expo Go can no longer provide full access to the media library. To test the full functionality of this module, you can create a development build. https://docs.expo.dev/develop/development-builds/create-a-build
+[1mAndroid[22m [0m[2mnode_modules/expo-router/[22m[0m[1mentry.js[22m [47m[37m░░░░░░░░░░░░░░░░[39m[49m[1m  0.0% [22m[2m(0/1)[22m
+[108D[1A[0J[32m[1mAndroid[22m Bundled [39m[2m77ms[22m[0m[2m node_modules/expo-router/entry.js (1 module)[22m[0m
+[7m[33m[1m WARN [22m[39m[27m Due to changes in Androids permission requirements, Expo Go can no longer provide full access to the media library. To test the full functionality of this module, you can create a development build. https://docs.expo.dev/develop/development-builds/create-a-build
+[7m[31m[1m ERROR [22m[39m[27m [Error: Uncaught (in promise, id: 0) Error: Call to function 'ExpoMediaLibrary.getPermissionsAsync' has been rejected.
+→ Caused by: You have requested the AUDIO permission, but it is not declared in AndroidManifest. Update expo-media-library config plugin to include the permission before requesting it.] 
+
+[1mCode: construct.js[22m
+[0m [90m 2 |[39m [36mvar[39m setPrototypeOf [33m=[39m require([32m"./setPrototypeOf.js"[39m)[33m;[39m
+ [90m 3 |[39m [36mfunction[39m _construct(t[33m,[39m e[33m,[39m r) {
+[31m[1m>[22m[39m[90m 4 |[39m   [36mif[39m (isNativeReflectConstruct()) [36mreturn[39m [33mReflect[39m[33m.[39mconstruct[33m.[39mapply([36mnull[39m[33m,[39m arguments)[33m;[39m
+ [90m   |[39m                                                                 [31m[1m^[22m[39m
+ [90m 5 |[39m   [36mvar[39m o [33m=[39m [[36mnull[39m][33m;[39m
+ [90m 6 |[39m   o[33m.[39mpush[33m.[39mapply(o[33m,[39m e)[33m;[39m
+ [90m 7 |[39m   [36mvar[39m p [33m=[39m [36mnew[39m (t[33m.[39mbind[33m.[39mapply(t[33m,[39m o))()[33m;[39m[0m
+[1mCall Stack[22m
+[2m[90m  construct (<native>)[39m[22m
+[2m[90m  apply (<native>)[39m[22m
+[2m[90m  _construct (node_modules/@babel/runtime/helpers/construct.js:4:65)[39m[22m
+[2m[90m  Wrapper (node_modules/@babel/runtime/helpers/wrapNativeSuper.js:15:23)[39m[22m
+[2m[90m  construct (<native>)[39m[22m
+[2m[90m  _callSuper (node_modules/@babel/runtime/helpers/callSuper.js:5:108)[39m[22m
+[2m[90m  constructor (node_modules/expo-modules-core/src/errors/CodedError.ts:11:5)[39m[22m
+[7m[31m[1m ERROR [22m[39m[27m [Error: Uncaught (in promise, id: 1) Error: Call to function 'ExpoMediaLibrary.requestPermissionsAsync' has been rejected.
+→ Caused by: You have requested the AUDIO permission, but it is not declared in AndroidManifest. Update expo-media-library config plugin to include the permission before requesting it.] 
+
+[1mCode: construct.js[22m
+[0m [90m 2 |[39m [36mvar[39m setPrototypeOf [33m=[39m require([32m"./setPrototypeOf.js"[39m)[33m;[39m
+ [90m 3 |[39m [36mfunction[39m _construct(t[33m,[39m e[33m,[39m r) {
+[31m[1m>[22m[39m[90m 4 |[39m   [36mif[39m (isNativeReflectConstruct()) [36mreturn[39m [33mReflect[39m[33m.[39mconstruct[33m.[39mapply([36mnull[39m[33m,[39m arguments)[33m;[39m
+ [90m   |[39m                                                                 [31m[1m^[22m[39m
+ [90m 5 |[39m   [36mvar[39m o [33m=[39m [[36mnull[39m][33m;[39m
+ [90m 6 |[39m   o[33m.[39mpush[33m.[39mapply(o[33m,[39m e)[33m;[39m
+ [90m 7 |[39m   [36mvar[39m p [33m=[39m [36mnew[39m (t[33m.[39mbind[33m.[39mapply(t[33m,[39m o))()[33m;[39m[0m
+[1mCall Stack[22m
+[2m[90m  construct (<native>)[39m[22m
+[2m[90m  apply (<native>)[39m[22m
+[2m[90m  _construct (node_modules/@babel/runtime/helpers/construct.js:4:65)[39m[22m
+[2m[90m  Wrapper (node_modules/@babel/runtime/helpers/wrapNativeSuper.js:15:23)[39m[22m
+[2m[90m  construct (<native>)[39m[22m
+[2m[90m  _callSuper (node_modules/@babel/runtime/helpers/callSuper.js:5:108)[39m[22m
+[2m[90m  constructor (node_modules/expo-modules-core/src/errors/CodedError.ts:11:5)[39m[22m
+[7m[31m[1m ERROR [22m[39m[27m [Error: Uncaught (in promise, id: 2) Error: Call to function 'ExpoMediaLibrary.requestPermissionsAsync' has been rejected.
+→ Caused by: You have requested the AUDIO permission, but it is not declared in AndroidManifest. Update expo-media-library config plugin to include the permission before requesting it.] 
+
+[1mCode: construct.js[22m
+[0m [90m 2 |[39m [36mvar[39m setPrototypeOf [33m=[39m require([32m"./setPrototypeOf.js"[39m)[33m;[39m
+ [90m 3 |[39m [36mfunction[39m _construct(t[33m,[39m e[33m,[39m r) {
+[31m[1m>[22m[39m[90m 4 |[39m   [36mif[39m (isNativeReflectConstruct()) [36mreturn[39m [33mReflect[39m[33m.[39mconstruct[33m.[39mapply([36mnull[39m[33m,[39m arguments)[33m;[39m
+ [90m   |[39m                                                                 [31m[1m^[22m[39m
+ [90m 5 |[39m   [36mvar[39m o [33m=[39m [[36mnull[39m][33m;[39m
+ [90m 6 |[39m   o[33m.[39mpush[33m.[39mapply(o[33m,[39m e)[33m;[39m
+ [90m 7 |[39m   [36mvar[39m p [33m=[39m [36mnew[39m (t[33m.[39mbind[33m.[39mapply(t[33m,[39m o))()[33m;[39m[0m
+[1mCall Stack[22m
+[2m[90m  construct (<native>)[39m[22m
+[2m[90m  apply (<native>)[39m[22m
+[2m[90m  _construct (node_modules/@babel/runtime/helpers/construct.js:4:65)[39m[22m
+[2m[90m  Wrapper (node_modules/@babel/runtime/helpers/wrapNativeSuper.js:15:23)[39m[22m
+[2m[90m  construct (<native>)[39m[22m
+[2m[90m  _callSuper (node_modules/@babel/runtime/helpers/callSuper.js:5:108)[39m[22m
+[2m[90m  constructor (node_modules/expo-modules-core/src/errors/CodedError.ts:11:5)[39m[22m
+[1mAndroid[22m [0m[2mnode_modules/expo-router/[22m[0m[1mentry.js[22m [47m[37m░░░░░░░░░░░░░░░░[39m[49m[1m  0.0% [22m[2m(0/1)[22m
+[108D[1A[0J[32m[1mAndroid[22m Bundled [39m[2m288ms[22m[0m[2m node_modules/expo-router/entry.js (1 module)[22m[0m
+[1mAndroid[22m [0m[2mnode_modules/expo-router/[22m[0m[1mentry.js[22m [47m[37m░░░░░░░░░░░░░░░░[39m[49m[1m  0.0% [22m[2m(0/1)[22m
+[108D[1A[0J[7m[33m[1m WARN [22m[39m[27m Due to changes in Androids permission requirements, Expo Go can no longer provide full access to the media library. To test the full functionality of this module, you can create a development build. https://docs.expo.dev/develop/development-builds/create-a-build
+[1mAndroid[22m [0m[2mnode_modules/expo-router/[22m[0m[1mentry.js[22m [47m[37m░░░░░░░░░░░░░░░░[39m[49m[1m  0.0% [22m[2m(0/1)[22m
+[108D[1A[0J[32m[1mAndroid[22m Bundled [39m[2m82ms[22m[0m[2m node_modules/expo-router/entry.js (1 module)[22m[0m
+[7m[33m[1m WARN [22m[39m[27m Due to changes in Androids permission requirements, Expo Go can no longer provide full access to the media library. To test the full functionality of this module, you can create a development build. https://docs.expo.dev/develop/development-builds/create-a-build
+[7m[31m[1m ERROR [22m[39m[27m [Error: Uncaught (in promise, id: 0) Error: Call to function 'ExpoMediaLibrary.getPermissionsAsync' has been rejected.
+→ Caused by: You have requested the AUDIO permission, but it is not declared in AndroidManifest. Update expo-media-library config plugin to include the permission before requesting it.] 
+
+[1mCode: construct.js[22m
+[0m [90m 2 |[39m [36mvar[39m setPrototypeOf [33m=[39m require([32m"./setPrototypeOf.js"[39m)[33m;[39m
+ [90m 3 |[39m [36mfunction[39m _construct(t[33m,[39m e[33m,[39m r) {
+[31m[1m>[22m[39m[90m 4 |[39m   [36mif[39m (isNativeReflectConstruct()) [36mreturn[39m [33mReflect[39m[33m.[39mconstruct[33m.[39mapply([36mnull[39m[33m,[39m arguments)[33m;[39m
+ [90m   |[39m                                                                 [31m[1m^[22m[39m
+ [90m 5 |[39m   [36mvar[39m o [33m=[39m [[36mnull[39m][33m;[39m
+ [90m 6 |[39m   o[33m.[39mpush[33m.[39mapply(o[33m,[39m e)[33m;[39m
+ [90m 7 |[39m   [36mvar[39m p [33m=[39m [36mnew[39m (t[33m.[39mbind[33m.[39mapply(t[33m,[39m o))()[33m;[39m[0m
+[1mCall Stack[22m
+[2m[90m  construct (<native>)[39m[22m
+[2m[90m  apply (<native>)[39m[22m
+[2m[90m  _construct (node_modules/@babel/runtime/helpers/construct.js:4:65)[39m[22m
+[2m[90m  Wrapper (node_modules/@babel/runtime/helpers/wrapNativeSuper.js:15:23)[39m[22m
+[2m[90m  construct (<native>)[39m[22m
+[2m[90m  _callSuper (node_modules/@babel/runtime/helpers/callSuper.js:5:108)[39m[22m
+[2m[90m  constructor (node_modules/expo-modules-core/src/errors/CodedError.ts:11:5)[39m[22m
+[7m[31m[1m ERROR [22m[39m[27m [Error: Uncaught (in promise, id: 1) Error: Call to function 'ExpoMediaLibrary.requestPermissionsAsync' has been rejected.
+→ Caused by: You have requested the AUDIO permission, but it is not declared in AndroidManifest. Update expo-media-library config plugin to include the permission before requesting it.] 
+
+[1mCode: construct.js[22m
+[0m [90m 2 |[39m [36mvar[39m setPrototypeOf [33m=[39m require([32m"./setPrototypeOf.js"[39m)[33m;[39m
+ [90m 3 |[39m [36mfunction[39m _construct(t[33m,[39m e[33m,[39m r) {
+[31m[1m>[22m[39m[90m 4 |[39m   [36mif[39m (isNativeReflectConstruct()) [36mreturn[39m [33mReflect[39m[33m.[39mconstruct[33m.[39mapply([36mnull[39m[33m,[39m arguments)[33m;[39m
+ [90m   |[39m                                                                 [31m[1m^[22m[39m
+ [90m 5 |[39m   [36mvar[39m o [33m=[39m [[36mnull[39m][33m;[39m
+ [90m 6 |[39m   o[33m.[39mpush[33m.[39mapply(o[33m,[39m e)[33m;[39m
+ [90m 7 |[39m   [36mvar[39m p [33m=[39m [36mnew[39m (t[33m.[39mbind[33m.[39mapply(t[33m,[39m o))()[33m;[39m[0m
+[1mCall Stack[22m
+[2m[90m  construct (<native>)[39m[22m
+[2m[90m  apply (<native>)[39m[22m
+[2m[90m  _construct (node_modules/@babel/runtime/helpers/construct.js:4:65)[39m[22m
+[2m[90m  Wrapper (node_modules/@babel/runtime/helpers/wrapNativeSuper.js:15:23)[39m[22m
+[2m[90m  construct (<native>)[39m[22m
+[2m[90m  _callSuper (node_modules/@babel/runtime/helpers/callSuper.js:5:108)[39m[22m
+[2m[90m  constructor (node_modules/expo-modules-core/src/errors/CodedError.ts:11:5)[39m[22m
+[7m[31m[1m ERROR [22m[39m[27m [Error: Uncaught (in promise, id: 2) Error: Call to function 'ExpoMediaLibrary.requestPermissionsAsync' has been rejected.
+→ Caused by: You have requested the AUDIO permission, but it is not declared in AndroidManifest. Update expo-media-library config plugin to include the permission before requesting it.] 
+
+[1mCode: construct.js[22m
+[0m [90m 2 |[39m [36mvar[39m setPrototypeOf [33m=[39m require([32m"./setPrototypeOf.js"[39m)[33m;[39m
+ [90m 3 |[39m [36mfunction[39m _construct(t[33m,[39m e[33m,[39m r) {
+[31m[1m>[22m[39m[90m 4 |[39m   [36mif[39m (isNativeReflectConstruct()) [36mreturn[39m [33mReflect[39m[33m.[39mconstruct[33m.[39mapply([36mnull[39m[33m,[39m arguments)[33m;[39m
+ [90m   |[39m                                                                 [31m[1m^[22m[39m
+ [90m 5 |[39m   [36mvar[39m o [33m=[39m [[36mnull[39m][33m;[39m
+ [90m 6 |[39m   o[33m.[39mpush[33m.[39mapply(o[33m,[39m e)[33m;[39m
+ [90m 7 |[39m   [36mvar[39m p [33m=[39m [36mnew[39m (t[33m.[39mbind[33m.[39mapply(t[33m,[39m o))()[33m;[39m[0m
+[1mCall Stack[22m
+[2m[90m  construct (<native>)[39m[22m
+[2m[90m  apply (<native>)[39m[22m
+[2m[90m  _construct (node_modules/@babel/runtime/helpers/construct.js:4:65)[39m[22m
+[2m[90m  Wrapper (node_modules/@babel/runtime/helpers/wrapNativeSuper.js:15:23)[39m[22m
+[2m[90m  construct (<native>)[39m[22m
+[2m[90m  _callSuper (node_modules/@babel/runtime/helpers/callSuper.js:5:108)[39m[22m
+[2m[90m  constructor (node_modules/expo-modules-core/src/errors/CodedError.ts:11:5)[39m[22m
+[7m[31m[1m ERROR [22m[39m[27m [Error: Uncaught (in promise, id: 3) Error: Call to function 'ExpoMediaLibrary.requestPermissionsAsync' has been rejected.
+→ Caused by: You have requested the AUDIO permission, but it is not declared in AndroidManifest. Update expo-media-library config plugin to include the permission before requesting it.] 
+
+[1mCode: construct.js[22m
+[0m [90m 2 |[39m [36mvar[39m setPrototypeOf [33m=[39m require([32m"./setPrototypeOf.js"[39m)[33m;[39m
+ [90m 3 |[39m [36mfunction[39m _construct(t[33m,[39m e[33m,[39m r) {
+[31m[1m>[22m[39m[90m 4 |[39m   [36mif[39m (isNativeReflectConstruct()) [36mreturn[39m [33mReflect[39m[33m.[39mconstruct[33m.[39mapply([36mnull[39m[33m,[39m arguments)[33m;[39m
+ [90m   |[39m                                                                 [31m[1m^[22m[39m
+ [90m 5 |[39m   [36mvar[39m o [33m=[39m [[36mnull[39m][33m;[39m
+ [90m 6 |[39m   o[33m.[39mpush[33m.[39mapply(o[33m,[39m e)[33m;[39m
+ [90m 7 |[39m   [36mvar[39m p [33m=[39m [36mnew[39m (t[33m.[39mbind[33m.[39mapply(t[33m,[39m o))()[33m;[39m[0m
+[1mCall Stack[22m
+[2m[90m  construct (<native>)[39m[22m
+[2m[90m  apply (<native>)[39m[22m
+[2m[90m  _construct (node_modules/@babel/runtime/helpers/construct.js:4:65)[39m[22m
+[2m[90m  Wrapper (node_modules/@babel/runtime/helpers/wrapNativeSuper.js:15:23)[39m[22m
+[2m[90m  construct (<native>)[39m[22m
+[2m[90m  _callSuper (node_modules/@babel/runtime/helpers/callSuper.js:5:108)[39m[22m
+[2m[90m  constructor (node_modules/expo-modules-core/src/errors/CodedError.ts:11:5)[39m[22m
+[7m[31m[1m ERROR [22m[39m[27m [Error: Uncaught (in promise, id: 4) Error: Call to function 'ExpoMediaLibrary.requestPermissionsAsync' has been rejected.
+→ Caused by: You have requested the AUDIO permission, but it is not declared in AndroidManifest. Update expo-media-library config plugin to include the permission before requesting it.] 
+
+[1mCode: construct.js[22m
+[0m [90m 2 |[39m [36mvar[39m setPrototypeOf [33m=[39m require([32m"./setPrototypeOf.js"[39m)[33m;[39m
+ [90m 3 |[39m [36mfunction[39m _construct(t[33m,[39m e[33m,[39m r) {
+[31m[1m>[22m[39m[90m 4 |[39m   [36mif[39m (isNativeReflectConstruct()) [36mreturn[39m [33mReflect[39m[33m.[39mconstruct[33m.[39mapply([36mnull[39m[33m,[39m arguments)[33m;[39m
+ [90m   |[39m                                                                 [31m[1m^[22m[39m
+ [90m 5 |[39m   [36mvar[39m o [33m=[39m [[36mnull[39m][33m;[39m
+ [90m 6 |[39m   o[33m.[39mpush[33m.[39mapply(o[33m,[39m e)[33m;[39m
+ [90m 7 |[39m   [36mvar[39m p [33m=[39m [36mnew[39m (t[33m.[39mbind[33m.[39mapply(t[33m,[39m o))()[33m;[39m[0m
+[1mCall Stack[22m
+[2m[90m  construct (<native>)[39m[22m
+[2m[90m  apply (<native>)[39m[22m
+[2m[90m  _construct (node_modules/@babel/runtime/helpers/construct.js:4:65)[39m[22m
+[2m[90m  Wrapper (node_modules/@babel/runtime/helpers/wrapNativeSuper.js:15:23)[39m[22m
+[2m[90m  construct (<native>)[39m[22m
+[2m[90m  _callSuper (node_modules/@babel/runtime/helpers/callSuper.js:5:108)[39m[22m
+[2m[90m  constructor (node_modules/expo-modules-core/src/errors/CodedError.ts:11:5)[39m[22m
+[7m[31m[1m ERROR [22m[39m[27m [Error: Uncaught (in promise, id: 5) Error: Call to function 'ExpoMediaLibrary.requestPermissionsAsync' has been rejected.
+→ Caused by: You have requested the AUDIO permission, but it is not declared in AndroidManifest. Update expo-media-library config plugin to include the permission before requesting it.] 
+
+[1mCode: construct.js[22m
+[0m [90m 2 |[39m [36mvar[39m setPrototypeOf [33m=[39m require([32m"./setPrototypeOf.js"[39m)[33m;[39m
+ [90m 3 |[39m [36mfunction[39m _construct(t[33m,[39m e[33m,[39m r) {
+[31m[1m>[22m[39m[90m 4 |[39m   [36mif[39m (isNativeReflectConstruct()) [36mreturn[39m [33mReflect[39m[33m.[39mconstruct[33m.[39mapply([36mnull[39m[33m,[39m arguments)[33m;[39m
+ [90m   |[39m                                                                 [31m[1m^[22m[39m
+ [90m 5 |[39m   [36mvar[39m o [33m=[39m [[36mnull[39m][33m;[39m
+ [90m 6 |[39m   o[33m.[39mpush[33m.[39mapply(o[33m,[39m e)[33m;[39m
+ [90m 7 |[39m   [36mvar[39m p [33m=[39m [36mnew[39m (t[33m.[39mbind[33m.[39mapply(t[33m,[39m o))()[33m;[39m[0m
+[1mCall Stack[22m
+[2m[90m  construct (<native>)[39m[22m
+[2m[90m  apply (<native>)[39m[22m
+[2m[90m  _construct (node_modules/@babel/runtime/helpers/construct.js:4:65)[39m[22m
+[2m[90m  Wrapper (node_modules/@babel/runtime/helpers/wrapNativeSuper.js:15:23)[39m[22m
+[2m[90m  construct (<native>)[39m[22m
+[2m[90m  _callSuper (node_modules/@babel/runtime/helpers/callSuper.js:5:108)[39m[22m
+[2m[90m  constructor (node_modules/expo-modules-core/src/errors/CodedError.ts:11:5)[39m[22m
+Unable to resolve "expo-media-library" from "app/(tabs)/status.tsx"
+
+undefined
+Unable to resolve "expo-media-library" from "app/(tabs)/status.tsx"
+
+undefined
+Unable to resolve "expo-media-library" from "app/(tabs)/status.tsx"
+
+undefined
+Unable to resolve "expo-media-library" from "app/(tabs)/status.tsx"
+
+undefined
+Unable to resolve "expo-media-library" from "app/(tabs)/status.tsx"
+
+undefined
+Unable to resolve "expo-media-library" from "app/(tabs)/status.tsx"
+
+undefined
