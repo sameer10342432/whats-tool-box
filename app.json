@@ -28,10 +28,8 @@
         "MEDIA_LIBRARY"
       ],
       "adaptiveIcon": {
-        "backgroundColor": "#075E54",
-        "foregroundImage": "./assets/images/android-icon-foreground.png",
-        "backgroundImage": "./assets/images/android-icon-background.png",
-        "monochromeImage": "./assets/images/android-icon-monochrome.png"
+        "backgroundColor": "#FFFFFF",
+        "foregroundImage": "./assets/images/android-icon-foreground.png"
       }
     },
     "web": {
