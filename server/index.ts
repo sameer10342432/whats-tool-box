@@ -29,12 +29,13 @@ function setupCors(app: express.Application) {
 
     const origin = req.header("origin");
 
-    // Allow localhost origins for Expo web development (any port)
-    const isLocalhost =
+    // Allow localhost and local network origins for development
+    const isLocal =
       origin?.startsWith("http://localhost:") ||
-      origin?.startsWith("http://127.0.0.1:");
+      origin?.startsWith("http://127.0.0.1:") ||
+      origin?.startsWith("http://192.168.");
 
-    if (origin && (origins.has(origin) || isLocalhost)) {
+    if (origin && (origins.has(origin) || isLocal)) {
       res.header("Access-Control-Allow-Origin", origin);
       res.header(
         "Access-Control-Allow-Methods",

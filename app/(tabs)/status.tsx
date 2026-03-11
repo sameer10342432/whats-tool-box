@@ -14,12 +14,16 @@ import {
   Share,
   ActivityIndicator,
   useColorScheme,
+  AppState,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import * as FileSystem from "expo-file-system";
+const { StorageAccessFramework } = FileSystem as any;
 import * as MediaLibrary from "expo-media-library";
 import * as Haptics from "expo-haptics";
+import Constants from "expo-constants";
+import { useIsFocused } from "@react-navigation/native";
 import Colors from "@/constants/colors";
 
 const { width: SCREEN_W } = Dimensions.get("window");
@@ -49,11 +53,13 @@ type StatusFile = {
 
 type TabType = "images" | "videos";
 
+
 export default function StatusScreen() {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
   const insets = useSafeAreaInsets();
   const theme = isDark ? Colors.dark : Colors.light;
+  const isFocused = useIsFocused();
 
   const [activeTab, setActiveTab] = useState<TabType>("images");
   const [images, setImages] = useState<StatusFile[]>([]);
@@ -68,11 +74,22 @@ export default function StatusScreen() {
   const topPad = Platform.OS === "web" ? 67 : insets.top;
   const bottomPad = Platform.OS === "web" ? 34 : insets.bottom;
 
+  // Auto-scan when tab is focused
   useEffect(() => {
-    if (Platform.OS === "android") {
+    if (isFocused && Platform.OS === "android") {
       requestPermissionAndScan();
     }
-  }, []);
+  }, [isFocused]);
+
+  // Auto-scan when app comes to foreground
+  useEffect(() => {
+    const subscription = AppState.addEventListener("change", (nextAppState) => {
+      if (nextAppState === "active" && isFocused && Platform.OS === "android") {
+        scanStatuses(true);
+      }
+    });
+    return () => subscription.remove();
+  }, [isFocused]);
 
   async function requestPermissionAndScan() {
     try {
@@ -90,9 +107,24 @@ export default function StatusScreen() {
     }
   }
 
+  async function grantFolderAccess() {
+    try {
+      const permissions = await StorageAccessFramework.requestDirectoryPermissionsAsync();
+      if (permissions.granted) {
+        setLoading(true);
+        const files = await StorageAccessFramework.readDirectoryAsync(permissions.directoryUri);
+        processFiles(permissions.directoryUri + "/", files);
+      }
+    } catch (e) {
+      Alert.alert("Error", "Could not access folder. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
   async function scanStatuses(isRefresh = false) {
     if (Platform.OS !== "android") return;
-
+    
     if (isRefresh) {
       setRefreshing(true);
     } else {
@@ -106,7 +138,6 @@ export default function StatusScreen() {
 
       for (const path of WHATSAPP_PATHS) {
         try {
-          // Check if path exists
           const info = await FileSystem.getInfoAsync(path);
           if (info.exists) {
             const files = await FileSystem.readDirectoryAsync(path);
@@ -116,63 +147,46 @@ export default function StatusScreen() {
               break;
             }
           }
-        } catch (err) {
-          // Silent fail for individual path checks
-        }
+        } catch (err) {}
       }
 
-      if (!foundPath) {
-        // Try fallback check without trailing slash just in case
-        for (const path of WHATSAPP_PATHS) {
-          const base = path.endsWith("/") ? path.slice(0, -1) : path;
-          try {
-            const info = await FileSystem.getInfoAsync(base);
-            if (info.exists) {
-              const files = await FileSystem.readDirectoryAsync(base);
-              if (files && files.length > 0) {
-                foundPath = base.endsWith("/") ? base : base + "/";
-                allFiles = files;
-                break;
-              }
-            }
-          } catch {}
-        }
-      }
-
-      if (!foundPath) {
+      if (foundPath) {
+        processFiles(foundPath, allFiles);
+      } else {
         setError("no_folder");
         setImages([]);
         setVideos([]);
-        return;
       }
-
-      const imgs: StatusFile[] = [];
-      const vids: StatusFile[] = [];
-
-      for (const filename of allFiles) {
-        const lower = filename.toLowerCase();
-        const uri = foundPath + filename;
-
-        if (IMAGE_EXTS.some((ext) => lower.endsWith(ext))) {
-          imgs.push({ uri, filename, type: "image" });
-        } else if (VIDEO_EXTS.some((ext) => lower.endsWith(ext))) {
-          vids.push({ uri, filename, type: "video" });
-        }
-      }
-
-      // Sort by newest if possible (though we don't have mtime here easily without more info calls)
-      setImages(imgs.reverse());
-      setVideos(vids.reverse());
     } catch (e: any) {
-      const msg = e?.message || "";
-      if (msg.includes("permission") || msg.includes("Permission")) {
-        setError("permission");
-      } else {
-        setError("no_folder");
-      }
+      setError("no_folder");
     } finally {
       setLoading(false);
       setRefreshing(false);
+    }
+  }
+
+  function processFiles(basePath: string, files: string[]) {
+    const imgs: StatusFile[] = [];
+    const vids: StatusFile[] = [];
+
+    for (const fileUri of files) {
+      // SAF returns full URI, FileSystem.readDirectory returns just filename
+      const isFullUri = fileUri.startsWith("content://") || fileUri.startsWith("file://");
+      const uri = isFullUri ? fileUri : basePath + fileUri;
+      const filename = isFullUri ? fileUri.split("/").pop() || "" : fileUri;
+      const lower = filename.toLowerCase();
+
+      if (IMAGE_EXTS.some((ext) => lower.endsWith(ext))) {
+        imgs.push({ uri, filename, type: "image" });
+      } else if (VIDEO_EXTS.some((ext) => lower.endsWith(ext))) {
+        vids.push({ uri, filename, type: "video" });
+      }
+    }
+
+    setImages([...imgs].reverse());
+    setVideos([...vids].reverse());
+    if (imgs.length > 0 || vids.length > 0) {
+      setError(null);
     }
   }
 
@@ -318,11 +332,20 @@ export default function StatusScreen() {
             <Ionicons name="refresh" size={16} color="#fff" />
             <Text style={styles.actionButtonText}>Refresh</Text>
           </TouchableOpacity>
+
+          <TouchableOpacity 
+            style={[styles.actionButton, { marginTop: 10, backgroundColor: "#3b82f6" }]} 
+            onPress={grantFolderAccess}
+          >
+            <Ionicons name="folder-open" size={16} color="#fff" />
+            <Text style={styles.actionButtonText}>Grant Folder Access (New Androids)</Text>
+          </TouchableOpacity>
+
           <View style={[styles.noteBanner, { backgroundColor: isDark ? "#1A2A1A" : "#F0FFF4" }]}>
             <Ionicons name="information-circle-outline" size={16} color={Colors.primary} />
             <Text style={[styles.noteText, { color: theme.textSecondary }]}>
-              Note: This feature requires a production build of the app (not Expo Go) to access
-              WhatsApp's media folder.
+              If statuses still don't show, use "Grant Folder Access" and select the WhatsApp status folder:
+              {"\n"}Android {" > "} media {" > "} com.whatsapp {" > "} WhatsApp {" > "} Media {" > "} .Statuses
             </Text>
           </View>
         </View>

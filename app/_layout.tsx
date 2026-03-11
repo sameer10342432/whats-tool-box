@@ -11,6 +11,7 @@ import * as SplashScreen from "expo-splash-screen";
 import React, { useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { KeyboardProvider } from "react-native-keyboard-controller";
+import Constants from "expo-constants";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { queryClient } from "@/lib/query-client";
 import { useColorScheme } from "react-native";
@@ -101,13 +102,19 @@ export default function RootLayout() {
 
   if (!fontsLoaded && !fontError) return null;
 
+  const isExpoGo = Constants.appOwnership === "expo";
+
   return (
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
         <GestureHandlerRootView style={{ flex: 1 }}>
-          <KeyboardProvider>
+          {isExpoGo ? (
             <RootLayoutNav />
-          </KeyboardProvider>
+          ) : (
+            <KeyboardProvider>
+              <RootLayoutNav />
+            </KeyboardProvider>
+          )}
         </GestureHandlerRootView>
       </QueryClientProvider>
     </ErrorBoundary>
