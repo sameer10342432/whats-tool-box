@@ -27,15 +27,6 @@ type Tool = {
 
 const TOOLS: Tool[] = [
   {
-    id: "status",
-    title: "Status Saver",
-    description: "Save WhatsApp statuses",
-    icon: "images",
-    iconLib: "ionicons",
-    color: "#25D366",
-    route: "/(tabs)/status",
-  },
-  {
     id: "direct-chat",
     title: "Direct Chat",
     description: "Chat without saving number",
@@ -80,24 +71,6 @@ const TOOLS: Tool[] = [
     color: "#F59E0B",
     route: "/ai-caption",
   },
-  {
-    id: "scheduler",
-    title: "Status Scheduler",
-    description: "Schedule your statuses",
-    icon: "time",
-    iconLib: "ionicons",
-    color: "#EF4444",
-    route: "/status-scheduler",
-  },
-  {
-    id: "saved",
-    title: "Saved Gallery",
-    description: "Your saved statuses",
-    icon: "bookmark",
-    iconLib: "ionicons",
-    color: "#10B981",
-    route: "/saved-status",
-  },
 ];
 
 const ADVANCED_TOOLS: Tool[] = [
@@ -109,15 +82,6 @@ const ADVANCED_TOOLS: Tool[] = [
     iconLib: "ionicons",
     color: "#6366F1",
     route: "/chat-backup",
-  },
-  {
-    id: "status-analytics",
-    title: "Status Analytics",
-    description: "Insights & storage stats",
-    icon: "bar-chart",
-    iconLib: "ionicons",
-    color: "#0EA5E9",
-    route: "/status-analytics",
   },
   {
     id: "ai-sticker",

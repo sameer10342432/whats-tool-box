@@ -14,10 +14,7 @@ function NativeTabLayout() {
         <Icon sf={{ default: "house", selected: "house.fill" }} />
         <Label>Home</Label>
       </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="status">
-        <Icon sf={{ default: "photo.on.rectangle", selected: "photo.on.rectangle.angled" }} />
-        <Label>Status</Label>
-      </NativeTabs.Trigger>
+
       <NativeTabs.Trigger name="tools">
         <Icon sf={{ default: "wrench", selected: "wrench.fill" }} />
         <Label>Tools</Label>
@@ -76,15 +73,7 @@ function ClassicTabLayout() {
           ),
         }}
       />
-      <Tabs.Screen
-        name="status"
-        options={{
-          title: "Status",
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="images" size={size} color={color} />
-          ),
-        }}
-      />
+
       <Tabs.Screen
         name="tools"
         options={{

@@ -1,13 +1,24 @@
 import type { Express } from "express";
 import { createServer, type Server } from "node:http";
+import "dotenv/config";
 import OpenAI from "openai";
 
 const openai = new OpenAI({
   apiKey: process.env.AI_INTEGRATIONS_OPENAI_API_KEY,
-  baseURL: process.env.AI_INTEGRATIONS_OPENAI_BASE_URL,
+  baseURL: "https://openrouter.ai/api/v1",
 });
 
+const DEFAULT_MODEL = "stepfun/step-3.5-flash:free";
+
 export async function registerRoutes(app: Express): Promise<Server> {
+  app.get("/api/test-ai", (req, res) => {
+    res.json({
+      status: "Ok",
+      hasKey: !!process.env.AI_INTEGRATIONS_OPENAI_API_KEY,
+      host: process.env.EXPO_PUBLIC_DOMAIN,
+    });
+  });
+
   app.post("/api/generate-caption", async (req, res) => {
     try {
       if (!process.env.AI_INTEGRATIONS_OPENAI_API_KEY) {
@@ -56,7 +67,7 @@ Return a JSON object with this exact structure:
 }`;
 
       const response = await openai.chat.completions.create({
-        model: "gpt-4o-mini",
+        model: DEFAULT_MODEL,
         messages: [{ role: "user", content: prompt }],
         response_format: { type: "json_object" },
         max_tokens: 1000,
@@ -98,7 +109,7 @@ Return a JSON object with this exact structure:
 Rules for tags: short 1-3 word phrases that would make great mini stickers for this pack theme (funny reactions, expressions, moods).`;
 
       const response = await openai.chat.completions.create({
-        model: "gpt-4o-mini",
+        model: DEFAULT_MODEL,
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: `Create a WhatsApp sticker pack for: ${prompt}` },
